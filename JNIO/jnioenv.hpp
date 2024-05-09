@@ -9,12 +9,14 @@
             private:
                 JNIOEnv() = default;
 
-                JNIEnv* environment;
+                mutable JNIEnv* environment;
 
             public:
                 JNIOEnv(JNIEnv* environment);
 
-                JNIEnv* get_JNIEnv() noexcept;
+                const JNIOEnv& operator = (const JNIOEnv& other) const;
+
+                JNIEnv* get_JNIEnv() const noexcept;
         };
     }
 
