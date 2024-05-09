@@ -2,7 +2,7 @@
 
 namespace jnio {
 
-    PureSignature::PureSignature(const char* signature) {
+    pure_signature::pure_signature(const char* signature) {
         size_t len = strlen(signature);
         this->signature = new char[len+1];
         this->signature[len] = '\0';
@@ -11,15 +11,15 @@ namespace jnio {
             this->signature[i] = signature[i];
         }
     }
-    PureSignature::PureSignature(const PureSignature& s) : PureSignature(s.getSignature()) {
+    pure_signature::pure_signature(const pure_signature& s) : pure_signature(s.get_signature()) {
     }
 
-    PureSignature::~PureSignature() {
+    pure_signature::~pure_signature() {
         delete[] this->signature;
     }
 
-    PureSignature& PureSignature::operator = (const PureSignature& ps2) noexcept {
-        const char* sign = ps2.getSignature();
+    pure_signature& pure_signature::operator = (const pure_signature& ps2) noexcept {
+        const char* sign = ps2.get_signature();
         size_t len = strlen(sign);
         this->signature = new char[len+1]; this->signature[len] = '\0';
 
@@ -29,64 +29,64 @@ namespace jnio {
 
         return *this;
     }
-    bool PureSignature::operator == (const PureSignature& ps2) const noexcept {
+    bool pure_signature::operator == (const pure_signature& ps2) const noexcept {
         return (strcmp(this->signature, ps2.signature) == 0);
     }
 
-    PureSignature::operator const char*() const noexcept {
+    pure_signature::operator const char*() const noexcept {
         return this->signature;
     }
-    const char* PureSignature::getSignature() const noexcept {
+    const char* pure_signature::get_signature() const noexcept {
         return this->signature;
     }
 
-    ComposedSignature::ComposedSignature(const PureSignature& ps) : PureSignature(ps) {
+    composed_signature::composed_signature(const pure_signature& ps) : pure_signature(ps) {
     }
-    ComposedSignature::ComposedSignature(const char* signature) : PureSignature(signature) {
+    composed_signature::composed_signature(const char* signature) : pure_signature(signature) {
     }
 
-    ComposedSignature& ComposedSignature::concat(const PureSignature& ps) {
-        if (ps == Signature::VOID) {
+    composed_signature& composed_signature::concat(const pure_signature& ps) {
+        if (ps == signature::VOID) {
             throw jnio_exception("A Void Signature cannot be part of a ComposedSignature.");
         }
 
-        size_t thislen = strlen(this->signature), len = strlen(ps.getSignature());
+        size_t thislen = strlen(this->signature), len = strlen(ps.get_signature());
         char* newSign = new char[thislen+len+1]; newSign[thislen+len] = '\0';
         for (size_t i = 0; i < thislen; i++) {
             newSign[i] = this->signature[i];
         }
         for (size_t i = thislen; i < thislen+len; i++) {
-            newSign[i] = ps.getSignature()[i-thislen];
+            newSign[i] = ps.get_signature()[i-thislen];
         }
         delete[] this->signature;
         this->signature = newSign;
 
         return *this;
     }
-    ComposedSignature& ComposedSignature::operator + (const PureSignature& ps) {
+    composed_signature& composed_signature::operator + (const pure_signature& ps) {
         return this->concat(ps);
     }
-    ComposedSignature& ComposedSignature::operator += (const PureSignature& ps) {
+    composed_signature& composed_signature::operator += (const pure_signature& ps) {
         return this->concat(ps);
     }
 
-    Signature::Signature(const char* signature) : PureSignature(signature) {
+    signature::signature(const char* signature) : pure_signature(signature) {
     }
-    Signature::Signature(const Signature& s) : PureSignature(s) {
+    signature::signature(const signature& s) : pure_signature(s) {
     }
 
-    const Signature Signature::BOOLEAN = Signature("Z");
-    const Signature Signature::BYTE = Signature("B");
-    const Signature Signature::CHAR = Signature("C");
-    const Signature Signature::SHORT = Signature("S");
-    const Signature Signature::INT = Signature("I");
-    const Signature Signature::LONG = Signature("J");
-    const Signature Signature::FLOAT = Signature("F");
-    const Signature Signature::DOUBLE = Signature("D");
+    const signature signature::BOOLEAN = signature("Z");
+    const signature signature::BYTE = signature("B");
+    const signature signature::CHAR = signature("C");
+    const signature signature::SHORT = signature("S");
+    const signature signature::INT = signature("I");
+    const signature signature::LONG = signature("J");
+    const signature signature::FLOAT = signature("F");
+    const signature signature::DOUBLE = signature("D");
 
-    const Signature Signature::VOID = Signature("V");
+    const signature signature::VOID = signature("V");
 
-    ObjectSignature::ObjectSignature(const char* obj) {
+    object_signature::object_signature(const char* obj) {
         if (obj[0] == 'L' || obj[0] == '[') {
             size_t len = strlen(obj);
             this->signature = new char[len+1]; this->signature[len] = '\0';
@@ -103,13 +103,13 @@ namespace jnio {
             this->signature[i] = (obj[i-1] == '.') ? '/' : obj[i-1];
         }
     }
-    ObjectSignature::ObjectSignature(const ObjectSignature& os) : PureSignature(os) {
+    object_signature::object_signature(const object_signature& os) : pure_signature(os) {
     }
 
-    const ObjectSignature ObjectSignature::STRING = ObjectSignature("java.lang.String");
-    const ObjectSignature ObjectSignature::OBJECT = ObjectSignature("java.lang.Object");
+    const object_signature object_signature::STRING = object_signature("java.lang.String");
+    const object_signature object_signature::OBJECT = object_signature("java.lang.Object");
 
-    ArraySignature::ArraySignature(const char* obj, size_t order) {
+    array_signature::array_signature(const char* obj, unsigned int order) {
         if (order == 0) {
             throw jnio_exception("Unable to create a Signature referring to a 0-dimensions array.");
         }
@@ -126,15 +126,15 @@ namespace jnio {
             this->signature[i] = (obj[i-1-order] == '.') ? '/' : obj[i-1-order];
         }
     }
-    ArraySignature::ArraySignature(const PureSignature& base, size_t order) {
+    array_signature::array_signature(const pure_signature& base, unsigned int order) {
         if (order == 0) {
             throw jnio_exception("Unable to create a Signature referring to a 0-dimensions array.");
         }
-        if (base == Signature::VOID) {
-            throw jnio_exception("Cannot create an ArraySignature of a void array.");
+        if (base == signature::VOID) {
+            throw jnio_exception("Cannot create an array_signature of a void array.");
         }
 
-        const char* sign = base.getSignature();
+        const char* sign = base.get_signature();
         size_t len = strlen(sign);
         this->signature = new char[len+1+order];
         for (size_t i = 0; i < order; i++) {
@@ -147,19 +147,19 @@ namespace jnio {
         }
     }
 
-    const ArraySignature ArraySignature::BOOLEAN_ARRAY = ArraySignature(Signature::BOOLEAN);
-    const ArraySignature ArraySignature::BYTE_ARRAY = ArraySignature(Signature::BYTE);
-    const ArraySignature ArraySignature::CHAR_ARRAY = ArraySignature(Signature::CHAR);
-    const ArraySignature ArraySignature::SHORT_ARRAY = ArraySignature(Signature::SHORT);
-    const ArraySignature ArraySignature::INT_ARRAY = ArraySignature(Signature::INT);
-    const ArraySignature ArraySignature::LONG_ARRAY = ArraySignature(Signature::LONG);
-    const ArraySignature ArraySignature::FLOAT_ARRAY = ArraySignature(Signature::FLOAT);
-    const ArraySignature ArraySignature::DOUBLE_ARRAY = ArraySignature(Signature::DOUBLE);
+    const array_signature array_signature::BOOLEAN_ARRAY = array_signature(signature::BOOLEAN);
+    const array_signature array_signature::BYTE_ARRAY = array_signature(signature::BYTE);
+    const array_signature array_signature::CHAR_ARRAY = array_signature(signature::CHAR);
+    const array_signature array_signature::SHORT_ARRAY = array_signature(signature::SHORT);
+    const array_signature array_signature::INT_ARRAY = array_signature(signature::INT);
+    const array_signature array_signature::LONG_ARRAY = array_signature(signature::LONG);
+    const array_signature array_signature::FLOAT_ARRAY = array_signature(signature::FLOAT);
+    const array_signature array_signature::DOUBLE_ARRAY = array_signature(signature::DOUBLE);
 
-    const ArraySignature ArraySignature::STRING_ARRAY = ArraySignature(ObjectSignature::STRING);
-    const ArraySignature ArraySignature::OBJECT_ARRAY = ArraySignature(ObjectSignature::OBJECT);
+    const array_signature array_signature::STRING_ARRAY = array_signature(object_signature::STRING);
+    const array_signature array_signature::OBJECT_ARRAY = array_signature(object_signature::OBJECT);
 
-    PureSignature ArraySignature::getBaseSignature() const noexcept {
+    pure_signature array_signature::getBaseSignature() const noexcept {
         size_t i = 0, len = strlen(this->signature);
         for (const char* ch = this->signature; *ch == '['; ch++) { i++; }
         char sign[len-i+1];
@@ -168,18 +168,18 @@ namespace jnio {
         }
         sign[len-i+1] = '\0';
 
-        return PureSignature(sign);
+        return pure_signature(sign);
     }
 
-    MethodSignature::MethodSignature(const char* signature) {
+    method_signature::method_signature(const char* signature) {
         size_t len = strlen(signature);
         this->signature = new char[len+1]; this->signature[len] = '\0';
         for (size_t i = 0; i < len; i++) {
             this->signature[i] = signature[i];
         }
     }
-    MethodSignature::MethodSignature(const PureSignature& returntype) {
-        const char* sign = returntype.getSignature();
+    method_signature::method_signature(const pure_signature& returntype) {
+        const char* sign = returntype.get_signature();
         size_t len = strlen(sign);
         char* fullname = new char[len+3];
         fullname[0] = '('; fullname[1] = ')';
@@ -191,7 +191,7 @@ namespace jnio {
 
         this->signature = fullname;
     }
-    MethodSignature::MethodSignature(const PureSignature& returntype, const ComposedSignature& args) {
+    method_signature::method_signature(const pure_signature& returntype, const composed_signature& args) {
         size_t retlen = strlen(returntype), arglen = strlen(args);
         this->signature = new char[retlen+arglen+3]; this->signature[retlen+arglen+2] = '\0';
         this->signature[0] = '('; this->signature[arglen+1] = ')';
@@ -203,8 +203,8 @@ namespace jnio {
             this->signature[i] = returntype[i-arglen-2];
         }
     }
-    MethodSignature::MethodSignature(const MethodSignature& ms) {
-        const char* sign = ms.getSignature();
+    method_signature::method_signature(const method_signature& ms) {
+        const char* sign = ms.get_signature();
         size_t len = strlen(sign);
         this->signature = new char[len+1]; this->signature[len] = '\0';
 
@@ -213,33 +213,33 @@ namespace jnio {
         }
     }
 
-    MethodSignature::~MethodSignature() {
+    method_signature::~method_signature() {
         delete[] this->signature;
     }
 
-    const MethodSignature MethodSignature::BOOLEAN_METHOD = MethodSignature(Signature::BOOLEAN);
-    const MethodSignature MethodSignature::BYTE_METHOD = MethodSignature(Signature::BYTE);
-    const MethodSignature MethodSignature::SHORT_METHOD = MethodSignature(Signature::SHORT);
-    const MethodSignature MethodSignature::CHAR_METHOD = MethodSignature(Signature::CHAR);
-    const MethodSignature MethodSignature::INT_METHOD = MethodSignature(Signature::INT);
-    const MethodSignature MethodSignature::LONG_METHOD = MethodSignature(Signature::LONG);
-    const MethodSignature MethodSignature::FLOAT_METHOD = MethodSignature(Signature::FLOAT);
-    const MethodSignature MethodSignature::DOUBLE_METHOD = MethodSignature(Signature::DOUBLE);
+    const method_signature method_signature::BOOLEAN_METHOD = method_signature(signature::BOOLEAN);
+    const method_signature method_signature::BYTE_METHOD = method_signature(signature::BYTE);
+    const method_signature method_signature::SHORT_METHOD = method_signature(signature::SHORT);
+    const method_signature method_signature::CHAR_METHOD = method_signature(signature::CHAR);
+    const method_signature method_signature::INT_METHOD = method_signature(signature::INT);
+    const method_signature method_signature::LONG_METHOD = method_signature(signature::LONG);
+    const method_signature method_signature::FLOAT_METHOD = method_signature(signature::FLOAT);
+    const method_signature method_signature::DOUBLE_METHOD = method_signature(signature::DOUBLE);
 
-    const MethodSignature MethodSignature::VOID_METHOD = MethodSignature(Signature::VOID);
+    const method_signature method_signature::VOID_METHOD = method_signature(signature::VOID);
     
-    const MethodSignature MethodSignature::STRING_METHOD = MethodSignature(ObjectSignature::STRING);
+    const method_signature method_signature::STRING_METHOD = method_signature(object_signature::STRING);
 
-    const MethodSignature MethodSignature::MAIN = MethodSignature(Signature::VOID, ComposedSignature(ArraySignature(ObjectSignature::STRING)));
+    const method_signature method_signature::MAIN = method_signature(signature::VOID, composed_signature(array_signature(object_signature::STRING)));
     
-    const MethodSignature MethodSignature::TO_STRING = MethodSignature(ObjectSignature::STRING);
-    const MethodSignature MethodSignature::EQUALS = MethodSignature(Signature::BOOLEAN, ComposedSignature(ObjectSignature::OBJECT));
-    const MethodSignature MethodSignature::HASH_CODE = MethodSignature(Signature::INT);
-    const MethodSignature MethodSignature::WAIT = MethodSignature(Signature::VOID);
-    const MethodSignature MethodSignature::NOTIFY = MethodSignature(Signature::VOID);
+    const method_signature method_signature::TO_STRING = method_signature(object_signature::STRING);
+    const method_signature method_signature::EQUALS = method_signature(signature::BOOLEAN, composed_signature(object_signature::OBJECT));
+    const method_signature method_signature::HASH_CODE = method_signature(signature::INT);
+    const method_signature method_signature::WAIT = method_signature(signature::VOID);
+    const method_signature method_signature::NOTIFY = method_signature(signature::VOID);
 
-    MethodSignature& MethodSignature::operator = (const MethodSignature& ms) noexcept {
-        const char* sign = ms.getSignature();
+    method_signature& method_signature::operator = (const method_signature& ms) noexcept {
+        const char* sign = ms.get_signature();
         size_t len = strlen(sign);
         this->signature = new char[len+1]; this->signature[len] = '\0';
 
@@ -249,54 +249,54 @@ namespace jnio {
 
         return *this;
     }
-    bool MethodSignature::operator == (const MethodSignature& ms) const noexcept {
+    bool method_signature::operator == (const method_signature& ms) const noexcept {
         return (strcmp(this->signature, ms.signature) == 0);
     }
 
-    MethodSignature::operator const char*() const noexcept {
+    method_signature::operator const char*() const noexcept {
         return this->signature;
     }
-    const char* MethodSignature::getSignature() const noexcept {
+    const char* method_signature::get_signature() const noexcept {
         return this->signature;
     }
 
-    const PureSignature MethodSignature::returnType() const noexcept {
+    const pure_signature method_signature::returnType() const noexcept {
         size_t len = strlen(this->signature); char* begin = this->signature;
         for (int i = 0; *begin != ')'; i++) { begin++; }
         if (*(begin+1) == '[' || *(begin+1) == 'L') {
-            return ObjectSignature("");
+            return object_signature("");
         }
         else {
             switch (*(begin+1)) {
-                case 'Z' : return Signature::BOOLEAN;
-                case 'B' : return Signature::BYTE;
-                case 'S' : return Signature::SHORT;
-                case 'C' : return Signature::BYTE;
-                case 'I' : return Signature::INT;
-                case 'J' : return Signature::LONG;
-                case 'F' : return Signature::FLOAT;
-                case 'D' : return Signature::DOUBLE;
-                case 'V' : return Signature::VOID;
+                case 'Z' : return signature::BOOLEAN;
+                case 'B' : return signature::BYTE;
+                case 'S' : return signature::SHORT;
+                case 'C' : return signature::BYTE;
+                case 'I' : return signature::INT;
+                case 'J' : return signature::LONG;
+                case 'F' : return signature::FLOAT;
+                case 'D' : return signature::DOUBLE;
+                case 'V' : return signature::VOID;
             }
         }
-        return Signature::VOID;
+        return signature::VOID;
     }
 
-    ConstructorSignature::ConstructorSignature() : MethodSignature(Signature::VOID) {
+    constructor_signature::constructor_signature() : method_signature(signature::VOID) {
     }
-    ConstructorSignature::ConstructorSignature(const char* signature) : MethodSignature(signature) {
+    constructor_signature::constructor_signature(const char* signature) : method_signature(signature) {
         if (signature[strlen(signature)-1] != 'V') {
             throw jnio_exception("ConstructorSignatures must not state any return type other than void: \"(...)V\"");
         }  
     }
-    ConstructorSignature::ConstructorSignature(const ComposedSignature& args) : MethodSignature(Signature::VOID, args) {
+    constructor_signature::constructor_signature(const composed_signature& args) : method_signature(signature::VOID, args) {
     }
-    ConstructorSignature::ConstructorSignature(const ConstructorSignature& cs) : MethodSignature(cs) {
+    constructor_signature::constructor_signature(const constructor_signature& cs) : method_signature(cs) {
     }
 
-    const ConstructorSignature ConstructorSignature::DEFAULT = ConstructorSignature();
+    const constructor_signature constructor_signature::DEFAULT = constructor_signature();
 
-    FieldSignature::FieldSignature(const char* signature) {
+    field_signature::field_signature(const char* signature) {
         size_t len = strlen(signature);
         this->signature = new char[len+1]; this->signature[len] = '\0';
         
@@ -313,8 +313,8 @@ namespace jnio {
             throw jnio_exception("FieldSignatures must not contain any method-like declaration.");
         }
     }
-    FieldSignature::FieldSignature(const PureSignature& type) {
-        const char* typeStr = type.getSignature();
+    field_signature::field_signature(const pure_signature& type) {
+        const char* typeStr = type.get_signature();
         size_t len = strlen(type);
         this->signature = new char[len+1]; this->signature[len] = '\0';
 
@@ -322,27 +322,27 @@ namespace jnio {
             this->signature[i] = typeStr[i];
         }
     }
-    FieldSignature::FieldSignature(const FieldSignature& fs) {
+    field_signature::field_signature(const field_signature& fs) {
         this->signature = fs.signature;
     }
 
-    FieldSignature::~FieldSignature() {
+    field_signature::~field_signature() {
         delete[] this->signature;
     }
 
-    const FieldSignature FieldSignature::BOOLEAN_FIELD = FieldSignature(Signature::BOOLEAN);
-    const FieldSignature FieldSignature::BYTE_FIELD = FieldSignature(Signature::BYTE);
-    const FieldSignature FieldSignature::SHORT_FIELD = FieldSignature(Signature::SHORT);
-    const FieldSignature FieldSignature::CHAR_FIELD = FieldSignature(Signature::CHAR);
-    const FieldSignature FieldSignature::INT_FIELD = FieldSignature(Signature::INT);
-    const FieldSignature FieldSignature::LONG_FIELD = FieldSignature(Signature::LONG);
-    const FieldSignature FieldSignature::FLOAT_FIELD = FieldSignature(Signature::FLOAT);
-    const FieldSignature FieldSignature::DOUBLE_FIELD = FieldSignature(Signature::DOUBLE);
+    const field_signature field_signature::BOOLEAN_FIELD = field_signature(signature::BOOLEAN);
+    const field_signature field_signature::BYTE_FIELD = field_signature(signature::BYTE);
+    const field_signature field_signature::SHORT_FIELD = field_signature(signature::SHORT);
+    const field_signature field_signature::CHAR_FIELD = field_signature(signature::CHAR);
+    const field_signature field_signature::INT_FIELD = field_signature(signature::INT);
+    const field_signature field_signature::LONG_FIELD = field_signature(signature::LONG);
+    const field_signature field_signature::FLOAT_FIELD = field_signature(signature::FLOAT);
+    const field_signature field_signature::DOUBLE_FIELD = field_signature(signature::DOUBLE);
 
-    const FieldSignature FieldSignature::STRING_FIELD = FieldSignature(ObjectSignature::STRING);
+    const field_signature field_signature::STRING_FIELD = field_signature(object_signature::STRING);
 
-    FieldSignature& FieldSignature::operator = (const FieldSignature& ms) noexcept {
-        const char* sign = ms.getSignature();
+    field_signature& field_signature::operator = (const field_signature& ms) noexcept {
+        const char* sign = ms.get_signature();
         size_t len = strlen(sign);
         this->signature = new char[len+1]; this->signature[len] = '\0';
 
@@ -352,14 +352,14 @@ namespace jnio {
 
         return *this;
     }
-    bool FieldSignature::operator == (const FieldSignature& ms) const noexcept {
+    bool field_signature::operator == (const field_signature& ms) const noexcept {
         return (strcmp(this->signature, ms.signature) == 0);
     }
 
-    FieldSignature::operator const char*() const noexcept {
+    field_signature::operator const char*() const noexcept {
         return this->signature;
     }
-    const char* FieldSignature::getSignature() const noexcept {
+    const char* field_signature::get_signature() const noexcept {
         return this->signature;
     }
 }

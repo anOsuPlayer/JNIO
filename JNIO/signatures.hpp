@@ -7,170 +7,170 @@
 
     namespace jnio {
 
-        class PureSignature {
+        class pure_signature {
             protected:
                 char* signature;
-                PureSignature() = default;
+                pure_signature() = default;
             
             public:
-                explicit PureSignature(const char* signature);
-                PureSignature(const PureSignature& ps);
-                virtual ~PureSignature();
+                explicit pure_signature(const char* signature);
+                pure_signature(const pure_signature& ps);
+                virtual ~pure_signature();
 
-                virtual PureSignature& operator = (const PureSignature& ps2) noexcept;
-                virtual bool operator == (const PureSignature& ps2) const noexcept;
+                virtual pure_signature& operator = (const pure_signature& ps2) noexcept;
+                virtual bool operator == (const pure_signature& ps2) const noexcept;
 
                 operator const char*() const noexcept;
-                const char* getSignature() const noexcept;
+                const char* get_signature() const noexcept;
 
-            friend class ArraySignature;
+            friend class array_signature;
         };
 
-        class ComposedSignature : public PureSignature {
+        class composed_signature : public pure_signature {
             public:
-                explicit ComposedSignature(const char* signature);
-                ComposedSignature(const PureSignature& ps);
-                virtual ~ComposedSignature() = default;
+                explicit composed_signature(const char* signature);
+                composed_signature(const pure_signature& ps);
+                virtual ~composed_signature() = default;
 
-                ComposedSignature& concat(const PureSignature& ps);
-                ComposedSignature& operator + (const PureSignature& ps);
-                ComposedSignature& operator += (const PureSignature& ps);
+                composed_signature& concat(const pure_signature& ps);
+                composed_signature& operator + (const pure_signature& ps);
+                composed_signature& operator += (const pure_signature& ps);
         };
 
-        class Signature : public PureSignature {
+        class signature : public pure_signature {
             public:
-                Signature() = delete;
-                explicit Signature(const char* signature);
-                Signature(const Signature& s);
-                virtual ~Signature() = default;
+                signature() = delete;
+                explicit signature(const char* signature);
+                signature(const signature& s);
+                virtual ~signature() = default;
 
-                static const Signature BOOLEAN;
-                static const Signature BYTE;
-                static const Signature CHAR;
-                static const Signature SHORT;
-                static const Signature INT;
-                static const Signature LONG;
-                static const Signature FLOAT;
-                static const Signature DOUBLE;
+                static const signature BOOLEAN;
+                static const signature BYTE;
+                static const signature CHAR;
+                static const signature SHORT;
+                static const signature INT;
+                static const signature LONG;
+                static const signature FLOAT;
+                static const signature DOUBLE;
 
-                static const Signature VOID;
+                static const signature VOID;
         };
 
-        class ObjectSignature : public PureSignature {
+        class object_signature : public pure_signature {
             public:
-                ObjectSignature() = delete;
-                ObjectSignature(const char* obj);
-                ObjectSignature(const ObjectSignature& os);
-                virtual ~ObjectSignature() = default;
+                object_signature() = delete;
+                object_signature(const char* obj);
+                object_signature(const object_signature& os);
+                virtual ~object_signature() = default;
 
-                static const ObjectSignature STRING;
-                static const ObjectSignature OBJECT;
+                static const object_signature STRING;
+                static const object_signature OBJECT;
         };
 
-        class ArraySignature : public PureSignature {
+        class array_signature : public pure_signature {
             public:
-                ArraySignature() = delete;
-                ArraySignature(const char* obj, unsigned int order = 1);
-                ArraySignature(const PureSignature& base, unsigned int order = 1);
-                virtual ~ArraySignature() = default;
+                array_signature() = delete;
+                array_signature(const char* obj, unsigned int order = 1);
+                array_signature(const pure_signature& base, unsigned int order = 1);
+                virtual ~array_signature() = default;
 
-                static const ArraySignature BOOLEAN_ARRAY;
-                static const ArraySignature BYTE_ARRAY;
-                static const ArraySignature CHAR_ARRAY;
-                static const ArraySignature SHORT_ARRAY;
-                static const ArraySignature INT_ARRAY;
-                static const ArraySignature LONG_ARRAY;
-                static const ArraySignature FLOAT_ARRAY;
-                static const ArraySignature DOUBLE_ARRAY;
+                static const array_signature BOOLEAN_ARRAY;
+                static const array_signature BYTE_ARRAY;
+                static const array_signature CHAR_ARRAY;
+                static const array_signature SHORT_ARRAY;
+                static const array_signature INT_ARRAY;
+                static const array_signature LONG_ARRAY;
+                static const array_signature FLOAT_ARRAY;
+                static const array_signature DOUBLE_ARRAY;
 
-                static const ArraySignature STRING_ARRAY;
-                static const ArraySignature OBJECT_ARRAY;
+                static const array_signature STRING_ARRAY;
+                static const array_signature OBJECT_ARRAY;
 
-                PureSignature getBaseSignature() const noexcept;
+                pure_signature getBaseSignature() const noexcept;
         };
 
-        class MethodSignature {
+        class method_signature {
             private:
                 char* signature;
 
             public:
-                MethodSignature() = default;
-                explicit MethodSignature(const char* signature);
-                MethodSignature(const PureSignature& returntype);
-                MethodSignature(const PureSignature& returntype, const ComposedSignature& args);
-                MethodSignature(const MethodSignature& ms);
-                ~MethodSignature();
+                method_signature() = default;
+                explicit method_signature(const char* signature);
+                method_signature(const pure_signature& returntype);
+                method_signature(const pure_signature& returntype, const composed_signature& args);
+                method_signature(const method_signature& ms);
+                ~method_signature();
 
-                static const MethodSignature BOOLEAN_METHOD;
-                static const MethodSignature BYTE_METHOD;
-                static const MethodSignature SHORT_METHOD;
-                static const MethodSignature CHAR_METHOD;
-                static const MethodSignature INT_METHOD;
-                static const MethodSignature LONG_METHOD;
-                static const MethodSignature FLOAT_METHOD;
-                static const MethodSignature DOUBLE_METHOD;
+                static const method_signature BOOLEAN_METHOD;
+                static const method_signature BYTE_METHOD;
+                static const method_signature SHORT_METHOD;
+                static const method_signature CHAR_METHOD;
+                static const method_signature INT_METHOD;
+                static const method_signature LONG_METHOD;
+                static const method_signature FLOAT_METHOD;
+                static const method_signature DOUBLE_METHOD;
                 
-                static const MethodSignature VOID_METHOD;
+                static const method_signature VOID_METHOD;
 
-                static const MethodSignature STRING_METHOD;
+                static const method_signature STRING_METHOD;
 
-                static const MethodSignature MAIN;
+                static const method_signature MAIN;
 
-                static const MethodSignature TO_STRING;
-                static const MethodSignature EQUALS;
-                static const MethodSignature HASH_CODE;
-                static const MethodSignature WAIT;
-                static const MethodSignature NOTIFY;
+                static const method_signature TO_STRING;
+                static const method_signature EQUALS;
+                static const method_signature HASH_CODE;
+                static const method_signature WAIT;
+                static const method_signature NOTIFY;
 
-                virtual MethodSignature& operator = (const MethodSignature& ms) noexcept;
-                virtual bool operator == (const MethodSignature& ms) const noexcept;
+                virtual method_signature& operator = (const method_signature& ms) noexcept;
+                virtual bool operator == (const method_signature& ms) const noexcept;
 
                 operator const char*() const noexcept;
-                const char* getSignature() const noexcept;
+                const char* get_signature() const noexcept;
 
-                const PureSignature returnType() const noexcept;
+                const pure_signature returnType() const noexcept;
             
-            friend class ConstructorSignature;
+            friend class constructor_signature;
         };
 
-        class ConstructorSignature : public MethodSignature {
+        class constructor_signature : public method_signature {
             public:
-                ConstructorSignature();
-                explicit ConstructorSignature(const char* signature);
-                ConstructorSignature(const ComposedSignature& args);
-                ConstructorSignature(const ConstructorSignature& cs);
-                ~ConstructorSignature() = default;
+                constructor_signature();
+                explicit constructor_signature(const char* signature);
+                constructor_signature(const composed_signature& args);
+                constructor_signature(const constructor_signature& cs);
+                ~constructor_signature() = default;
 
-                static const ConstructorSignature DEFAULT;
+                static const constructor_signature DEFAULT;
         };
 
-        class FieldSignature {
+        class field_signature {
             private:
                 char* signature;
 
             public:
-                FieldSignature() = default;
-                explicit FieldSignature(const char* signature);
-                FieldSignature(const PureSignature& type);
-                FieldSignature(const FieldSignature& fs);
-                ~FieldSignature();
+                field_signature() = default;
+                explicit field_signature(const char* signature);
+                field_signature(const pure_signature& type);
+                field_signature(const field_signature& fs);
+                ~field_signature();
 
-                static const FieldSignature BOOLEAN_FIELD;
-                static const FieldSignature BYTE_FIELD;
-                static const FieldSignature SHORT_FIELD;
-                static const FieldSignature CHAR_FIELD;
-                static const FieldSignature INT_FIELD;
-                static const FieldSignature LONG_FIELD;
-                static const FieldSignature FLOAT_FIELD;
-                static const FieldSignature DOUBLE_FIELD;
+                static const field_signature BOOLEAN_FIELD;
+                static const field_signature BYTE_FIELD;
+                static const field_signature SHORT_FIELD;
+                static const field_signature CHAR_FIELD;
+                static const field_signature INT_FIELD;
+                static const field_signature LONG_FIELD;
+                static const field_signature FLOAT_FIELD;
+                static const field_signature DOUBLE_FIELD;
 
-                static const FieldSignature STRING_FIELD;
+                static const field_signature STRING_FIELD;
 
-                virtual FieldSignature& operator = (const FieldSignature& ms) noexcept;
-                virtual bool operator == (const FieldSignature& ms) const noexcept;
+                virtual field_signature& operator = (const field_signature& ms) noexcept;
+                virtual bool operator == (const field_signature& ms) const noexcept;
 
                 operator const char*() const noexcept;
-                const char* getSignature() const noexcept;
+                const char* get_signature() const noexcept;
         };
     }
 
