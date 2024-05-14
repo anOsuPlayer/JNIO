@@ -1,14 +1,14 @@
-#ifndef JNIOUTILS
-    #define JNIOUTILS
+#ifndef JNIO_UTILS
+    #define JNIO_UTILS
 
     #include "jni.h"
     #include "jnioenv.hpp"
 
     #define JNIOImpl extern "C" JNIEXPORT JNICALL
 
-    #define DefaultArgs jnio::JNIOEnv env, jobject thisObj
+    #define member_args jnio::JNIOEnv env, jobject jthis
 
-    #define StaticArgs jnio::JNIOEnv env, jclass thisClass
+    #define static_args jnio::JNIOEnv env, jclass clazz
 
     namespace jnio {
 
@@ -16,21 +16,21 @@
 
         const jboolean FALSE = jboolean(JNI_FALSE);
 
-        jboolean operator ""jz (unsigned long long l);
+        jboolean operator ""_jz (unsigned long long);
 
-        jbyte operator ""jb (unsigned long long l);
+        jbyte operator ""_jb (unsigned long long);
         
-        jchar operator ""jc (unsigned long long l);
+        jchar operator ""_jc (unsigned long long);
         
-        jshort operator ""js (unsigned long long l);
+        jshort operator ""_js (unsigned long long);
         
-        jint operator ""ji (unsigned long long l);
+        jint operator ""_ji (unsigned long long);
         
-        jlong operator ""jl (unsigned long long l);
+        jlong operator ""_jl (unsigned long long);
         
-        jfloat operator ""jf (long double ld);
+        jfloat operator ""_jf (long double);
         
-        jdouble operator ""jd (long double ld);
+        jdouble operator ""_jd (long double);
     }
 
 #endif
