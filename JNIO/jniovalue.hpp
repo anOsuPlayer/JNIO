@@ -24,7 +24,7 @@
             STRING = -3
         };
 
-        class jnio_value {
+        class java_value {
             private:
                 union {
                     jboolean z;
@@ -42,7 +42,7 @@
 
                 static const jnio_exception badcast;
 
-                template <typename T> static const T castNumber(const jnio_value& val) {
+                template <typename T> static const T cast_number(const java_value& val) {
                     switch(val.tag) {
                         case value_tag::BYTE : {
                             return static_cast<T>(val.b);
@@ -66,51 +66,51 @@
                             return static_cast<T>(val.d);
                         }
                         default : {
-                            throw jnio_value::badcast;
+                            throw java_value::badcast;
                         }
                     }
                 }
 
             public:
-                jnio_value(const JNIOEnv& env);
-                jnio_value(const JNIOEnv& env, const jboolean& z);
-                jnio_value(const JNIOEnv& env, const jbyte& b);
-                jnio_value(const JNIOEnv& env, const jshort& s);
-                jnio_value(const JNIOEnv& env, const jchar& c);
-                jnio_value(const JNIOEnv& env, const jint& i);
-                jnio_value(const JNIOEnv& env, const jlong& j);
-                jnio_value(const JNIOEnv& env, const jfloat& f);
-                jnio_value(const JNIOEnv& env, const jdouble& d);
-                jnio_value(const JNIOEnv& env, const jobject& o);
-                jnio_value(const JNIOEnv& env, const char* str);
-                jnio_value(const jnio_value& val);
-                ~jnio_value() = default;
+                java_value(const JNIOEnv& env);
+                java_value(const JNIOEnv& env, jboolean z);
+                java_value(const JNIOEnv& env, jbyte b);
+                java_value(const JNIOEnv& env, jshort s);
+                java_value(const JNIOEnv& env, jchar c);
+                java_value(const JNIOEnv& env, jint i);
+                java_value(const JNIOEnv& env, jlong j);
+                java_value(const JNIOEnv& env, jfloat f);
+                java_value(const JNIOEnv& env, jdouble d);
+                java_value(const JNIOEnv& env, const jobject& o);
+                java_value(const JNIOEnv& env, const char* str);
+                java_value(const java_value& val);
+                ~java_value() = default;
 
-                jnio_value& operator = (const jboolean& z) noexcept;
-                jnio_value& operator = (const jbyte& b) noexcept;
-                jnio_value& operator = (const jshort& s) noexcept;
-                jnio_value& operator = (const jchar& c) noexcept;
-                jnio_value& operator = (const jint& i) noexcept;
-                jnio_value& operator = (const jlong& j) noexcept;
-                jnio_value& operator = (const jfloat& f) noexcept;
-                jnio_value& operator = (const jdouble& d) noexcept;
-                jnio_value& operator = (const jobject& o) noexcept;
-                jnio_value& operator = (const char* str) noexcept;
+                java_value& operator = (jboolean z) noexcept;
+                java_value& operator = (jbyte b) noexcept;
+                java_value& operator = (jshort s) noexcept;
+                java_value& operator = (jchar c) noexcept;
+                java_value& operator = (jint i) noexcept;
+                java_value& operator = (jlong j) noexcept;
+                java_value& operator = (jfloat f) noexcept;
+                java_value& operator = (jdouble d) noexcept;
+                java_value& operator = (const jobject& o) noexcept;
+                java_value& operator = (const char* str) noexcept;
 
-                jnio_value& operator = (const jnio_value& val) noexcept;
+                java_value& operator = (const java_value& val) noexcept;
 
-                bool operator == (const jnio_value& val) const noexcept;
+                bool operator == (const java_value& val) const noexcept;
 
-                void setValue(const jboolean& z) noexcept;
-                void setValue(const jbyte& b) noexcept;
-                void setValue(const jshort& s) noexcept;
-                void setValue(const jchar& c) noexcept;
-                void setValue(const jint& i) noexcept;
-                void setValue(const jlong& j) noexcept;
-                void setValue(const jfloat& f) noexcept;
-                void setValue(const jdouble& d) noexcept;
-                void setValue(const jobject& o) noexcept;
-                void setValue(const char* str) noexcept;
+                void set_value(jboolean z) noexcept;
+                void set_value(jbyte b) noexcept;
+                void set_value(jshort s) noexcept;
+                void set_value(jchar c) noexcept;
+                void set_value(jint i) noexcept;
+                void set_value(jlong j) noexcept;
+                void set_value(jfloat f) noexcept;
+                void set_value(jdouble d) noexcept;
+                void set_value(const jobject& o) noexcept;
+                void set_value(const char* str) noexcept;
 
                 operator const jboolean() const;
                 operator const jbyte() const;
@@ -125,7 +125,7 @@
 
                 operator const jvalue() const;
 
-                friend std::ostream& operator << (std::ostream& os, const jnio_value& val) noexcept {
+                friend std::ostream& operator << (std::ostream& os, const java_value& val) noexcept {
                     switch (val.tag) {
                         case value_tag::BOOLEAN : {
                             os << std::boolalpha << ((val.z == 0) ? false : true) << std::noboolalpha;
@@ -170,7 +170,7 @@
                             break;
                         }
                         case value_tag::NONE : {
-                            os << "Empty JValue";
+                            os << "empty value";
                             break;
                         }
                     }

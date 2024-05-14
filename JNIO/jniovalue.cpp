@@ -2,120 +2,120 @@
 
 namespace jnio {
 
-    jnio_value::jnio_value(const JNIOEnv& env) {
+    java_value::java_value(const JNIOEnv& env) {
         this->env = &env;
         this->tag = value_tag::NONE;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jboolean& z) : z{z} {
+    java_value::java_value(const JNIOEnv& env, jboolean z) : z{z} {
         this->env = &env;
         this->tag = value_tag::BOOLEAN;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jbyte& b) : b{b} {
+    java_value::java_value(const JNIOEnv& env, jbyte b) : b{b} {
         this->env = &env;
         this->tag = value_tag::BYTE;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jshort& s) : s{s} {
+    java_value::java_value(const JNIOEnv& env, jshort s) : s{s} {
         this->env = &env;
         this->tag = value_tag::SHORT;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jchar& c) : c{c} {
+    java_value::java_value(const JNIOEnv& env, jchar c) : c{c} {
         this->env = &env;
         this->tag = value_tag::CHAR;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jint& i) : i{i} {
+    java_value::java_value(const JNIOEnv& env, jint i) : i{i} {
         this->env = &env;
         this->tag = value_tag::INT;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jlong& j) : j{j} {
+    java_value::java_value(const JNIOEnv& env, jlong j) : j{j} {
         this->env = &env;
         this->tag = value_tag::LONG;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jfloat& f) : f{f} {
+    java_value::java_value(const JNIOEnv& env, jfloat f) : f{f} {
         this->env = &env;
         this->tag = value_tag::FLOAT;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jdouble& d) : d{d} {
+    java_value::java_value(const JNIOEnv& env, jdouble d) : d{d} {
         this->env = &env;
         this->tag = value_tag::DOUBLE;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const jobject& o) : o{o} {
+    java_value::java_value(const JNIOEnv& env, const jobject& o) : o{o} {
         this->env = &env;
         this->tag = value_tag::OBJECT;
     }
-    jnio_value::jnio_value(const JNIOEnv& env, const char* str) {
+    java_value::java_value(const JNIOEnv& env, const char* str) {
         this->env = &env;
         this->o = env.get_JNIEnv()->NewStringUTF(str);
         this->tag = value_tag::STRING;
     }
 
-    jnio_value::jnio_value(const jnio_value& val) {
+    java_value::java_value(const java_value& val) {
         *this = val;
     }
 
-    const jnio_exception jnio_value::badcast = jnio_exception("Illegal JValue cast.");
+    const jnio_exception java_value::badcast = jnio_exception("Illegal JValue cast.");
 
-    jnio_value& jnio_value::operator = (const jboolean& z) noexcept {
+    java_value& java_value::operator = (jboolean z) noexcept {
         this->tag = value_tag::BOOLEAN;
         this->z = z;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jbyte& b) noexcept {
+    java_value& java_value::operator = (jbyte b) noexcept {
         this->tag = value_tag::BYTE;
         this->b = b;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jshort& s) noexcept {
+    java_value& java_value::operator = (jshort s) noexcept {
         this->tag = value_tag::SHORT;
         this->s = s;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jchar& c) noexcept {
+    java_value& java_value::operator = (jchar c) noexcept {
         this->tag = value_tag::CHAR;
         this->c = c;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jint& i) noexcept {
+    java_value& java_value::operator = (jint i) noexcept {
         this->tag = value_tag::INT;
         this->i = i;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jlong& j) noexcept {
+    java_value& java_value::operator = (jlong j) noexcept {
         this->tag = value_tag::LONG;
         this->j = j;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jfloat& f) noexcept {
+    java_value& java_value::operator = (jfloat f) noexcept {
         this->tag = value_tag::FLOAT;
         this->f = f;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jdouble& d) noexcept {
+    java_value& java_value::operator = (jdouble d) noexcept {
         this->tag = value_tag::DOUBLE;
         this->d = d;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const jobject& o) noexcept {
+    java_value& java_value::operator = (const jobject& o) noexcept {
         this->tag = value_tag::OBJECT;
         this->o = o;
 
         return *this;
     }
-    jnio_value& jnio_value::operator = (const char* str) noexcept {
+    java_value& java_value::operator = (const char* str) noexcept {
         this->tag = value_tag::STRING;
         this->o = this->env->get_JNIEnv()->NewStringUTF(str);
 
         return *this;
     }
 
-    jnio_value& jnio_value::operator = (const jnio_value& val) noexcept {
+    java_value& java_value::operator = (const java_value& val) noexcept {
         this->env = val.env;
         this->tag = val.tag;
 
@@ -162,7 +162,7 @@ namespace jnio {
         return *this;
     }
 
-    bool jnio_value::operator == (const jnio_value& val) const noexcept {
+    bool java_value::operator == (const java_value& val) const noexcept {
         if (this->tag <= 0 || val.tag <= 0) {
             switch (this->tag) {
                 case value_tag::STRING : {
@@ -241,88 +241,88 @@ namespace jnio {
         return false;
     }
 
-    void jnio_value::setValue(const jboolean& z) noexcept {
+    void java_value::set_value(jboolean z) noexcept {
         this->tag = value_tag::BOOLEAN;
         this->z = z;
     }
-    void jnio_value::setValue(const jbyte& b) noexcept {
+    void java_value::set_value(jbyte b) noexcept {
         this->tag = value_tag::BYTE;
         this->b = b;
     }
-    void jnio_value::setValue(const jshort& s) noexcept {
+    void java_value::set_value(jshort s) noexcept {
         this->tag = value_tag::SHORT;
         this->s = s;
     }
-    void jnio_value::setValue(const jchar& c) noexcept {
+    void java_value::set_value(jchar c) noexcept {
         this->tag = value_tag::CHAR;
         this->c = c;
     }
-    void jnio_value::setValue(const jint& i) noexcept {
+    void java_value::set_value(jint i) noexcept {
         this->tag = value_tag::INT;
         this->i = i;
     }
-    void jnio_value::setValue(const jlong& j) noexcept {
+    void java_value::set_value(jlong j) noexcept {
         this->tag = value_tag::LONG;
         this->j = j;
     }
-    void jnio_value::setValue(const jfloat& f) noexcept {
+    void java_value::set_value(jfloat f) noexcept {
         this->tag = value_tag::FLOAT;
         this->f = f;
     }
-    void jnio_value::setValue(const jdouble& d) noexcept {
+    void java_value::set_value(jdouble d) noexcept {
         this->tag = value_tag::DOUBLE;
         this->d = d;
     }
-    void jnio_value::setValue(const jobject& o) noexcept {
+    void java_value::set_value(const jobject& o) noexcept {
         this->tag = value_tag::OBJECT;
         this->o = o;
     }
-    void jnio_value::setValue(const char* str) noexcept {
+    void java_value::set_value(const char* str) noexcept {
         this->tag = value_tag::STRING;
         this->o = this->env->get_JNIEnv()->NewStringUTF(str);
     }
 
-    jnio_value::operator const jboolean() const {
+    java_value::operator const jboolean() const {
         if (this->tag != value_tag::BOOLEAN) {
-            throw jnio_value::badcast;
+            throw java_value::badcast;
         }
         return this->z;
     }
-    jnio_value::operator const jbyte() const {
-        return jnio_value::castNumber<jbyte>(*this);
+    java_value::operator const jbyte() const {
+        return java_value::cast_number<jbyte>(*this);
     }
-    jnio_value::operator const jshort() const {
-        return jnio_value::castNumber<jshort>(*this);
+    java_value::operator const jshort() const {
+        return java_value::cast_number<jshort>(*this);
     }
-    jnio_value::operator const jchar() const {
-        return jnio_value::castNumber<jchar>(*this);
+    java_value::operator const jchar() const {
+        return java_value::cast_number<jchar>(*this);
     }
-    jnio_value::operator const jint() const {
-        return jnio_value::castNumber<jint>(*this);
+    java_value::operator const jint() const {
+        return java_value::cast_number<jint>(*this);
     }
-    jnio_value::operator const jlong() const {
-        return jnio_value::castNumber<jlong>(*this);
+    java_value::operator const jlong() const {
+        return java_value::cast_number<jlong>(*this);
     }
-    jnio_value::operator const jfloat() const {
-        return jnio_value::castNumber<jfloat>(*this);
+    java_value::operator const jfloat() const {
+        return java_value::cast_number<jfloat>(*this);
     }
-    jnio_value::operator const jdouble() const {
-        return jnio_value::castNumber<jdouble>(*this);
+    java_value::operator const jdouble() const {
+        return java_value::cast_number<jdouble>(*this);
     }
-    jnio_value::operator const jobject() const {
+    java_value::operator const jobject() const {
         if (this->tag == value_tag::OBJECT || this->tag == value_tag::STRING) {
             return this->o;
         }
-        throw jnio_value::badcast;
+        throw java_value::badcast;
     }
-    jnio_value::operator const jstring() const {
+    java_value::operator const jstring() const {
         if (this->tag == value_tag::OBJECT || this->tag == value_tag::STRING) {
             return (jstring) this->o;
         }
-        throw jnio_value::badcast;
+        throw java_value::badcast;
     }
 
-    jnio_value::operator const jvalue() const {
+    java_value::operator const jvalue() const {
         jvalue val;
 
         switch (this->tag) {
