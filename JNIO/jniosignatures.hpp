@@ -17,7 +17,7 @@
                 base_signature(const std::string&);
 
             public:
-                base_signature(const base_signature&);
+                base_signature(const base_signature&) = default;
                 ~base_signature() = default;
 
                 const base_signature& operator = (const base_signature&) noexcept;
@@ -53,7 +53,7 @@
                 array_signature(const std::string&);
 
             public:
-                array_signature(const base_signature&, unsigned int height = 1);
+                array_signature(const base_signature&, unsigned int height);
                 ~array_signature() = default;
 
                 base_signature component_type() const noexcept;

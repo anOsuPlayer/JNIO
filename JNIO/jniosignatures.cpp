@@ -10,15 +10,11 @@ namespace jnio {
         this->signature = signature;
     }
 
-    base_signature::base_signature(const base_signature& signature) {
-        this->signature = signature.signature;
-    }
-
     const std::string& base_signature::get_signature() const noexcept {
         return this->signature;
     }
 
-    const base_signature& base_signature::operator = (const base_signature& signature) {
+    const base_signature& base_signature::operator = (const base_signature& signature) noexcept {
         this->signature = signature.signature;
         return *this;
     }
