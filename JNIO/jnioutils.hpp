@@ -2,19 +2,18 @@
     #define JNIO_UTILS
 
     #include "jni.h"
-    #include "jnioenv.hpp"
-
+    
     #define JNIOImpl extern "C" JNIEXPORT JNICALL
-
-    #define member_args jnio::JNIOEnv env, jobject jthis
-
-    #define static_args jnio::JNIOEnv env, jclass clazz
 
     namespace jnio {
 
-        const jboolean TRUE = jboolean(JNI_TRUE);
+		#define member_args JNIEnv* env, jobject jthis
 
-        const jboolean FALSE = jboolean(JNI_FALSE);
+    	#define static_args JNIEnv* env, jclass clazz
+
+        static jboolean TRUE = jboolean(JNI_TRUE);
+
+        static jboolean FALSE = jboolean(JNI_FALSE);
 
         jboolean operator ""_jz (unsigned long long);
 

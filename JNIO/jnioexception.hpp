@@ -2,6 +2,7 @@
     #define JNIO_EXCEPTION
 
     #include <exception>
+	#include <stdexcept>
 
     namespace jnio {
 
@@ -11,7 +12,6 @@
 
             public:
                 jnio_exception() = delete;
-                
                 jnio_exception(const char* message);
 
                 virtual const char* what() const noexcept override;
