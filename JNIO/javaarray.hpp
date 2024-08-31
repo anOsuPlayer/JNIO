@@ -9,218 +9,209 @@
 
 	namespace jnio {
 
-		class JavaObject;
+		class java_object;
 
-		template <typename A> concept JArray = requires { std::is_base_of<jarray, A>(); };
+		template <typename A> concept base_array = requires { std::is_base_of<jarray, A>(); };
 
-		template <JArray A, typename T> class JavaArray {
+		template <base_array A, typename T> class java_array {
 			protected:
-				mutable T* elements;
-				mutable size_t size;
+				A arr;
+				mutable T* elements = nullptr;
 				JNIEnv* env;
 
-				JavaArray(JNIEnv* env, size_t size) {
+				java_array(JNIEnv* env) {
 					this->env = env;
-					this->elements = new T[size];
-					this->size = size;
 				}
+
+				virtual void release_elements() const noexcept = 0;
 
 			public:
-				virtual ~JavaArray() {
-					delete[] this->elements;
-				}
-
-				virtual JavaArray<A, T>& operator = (const JavaArray<A, T>& arr) noexcept final {
+				virtual ~java_array() {
 					if (this->elements != nullptr) {
-						delete[] this->elements;
+						free(this->elements);
 					}
-					this->size = arr.length();
-					this->elements = new T[size];
-					for (size_t i = 0; i < size; i++) {
-						this->elements[i] = arr.elements[i];
-					}
-
-					return *this;
 				}
 
-				virtual JavaArray<A, T>& operator = (A& arr) noexcept = 0;
-
-				T* get_elements() const noexcept {
+				const T* get_elements() const noexcept {
 					return this->elements;
 				}
 
 				T& operator [] (size_t index) {
 					if (index >= this->length()) {
-						throw std::out_of_range("The given index goes out of bounds for this JavaArray.");
+						throw std::out_of_range("The given index goes out of bounds for this java_array.");
 					}
 					return this->elements[index];
 				}
 
-				virtual A getJArray() const noexcept = 0;
+				virtual operator java_object() const noexcept = 0;
 
-				virtual operator A() const noexcept = 0;
-
-				JValue getJValue() const noexcept {
-					return JValue(*this);
+				explicit operator A() const noexcept {
+					release_elements();
+					return this->arr;
 				}
 
-				operator JValue() const noexcept {
-					return JValue(*this);
+				operator value() const noexcept {
+					release_elements();
+					return value(*this);
 				}
-
-				virtual JavaObject asObject() const noexcept = 0;
 				
 				size_t length() const noexcept {
-					return this->size;
+					release_elements();
+					return env->GetArrayLength(arr);
 				}
 		};
 
-		class JavaBooleanArray : public JavaArray<jbooleanArray, jboolean> {
+		class java_boolean_array : public java_array<jbooleanArray, jboolean> {
 			protected:
-				JavaBooleanArray() = default;
-
+				virtual void release_elements() const noexcept override final;
+			
 			public:
-				JavaBooleanArray(JNIEnv* env, jbooleanArray arr);
-				JavaBooleanArray(JNIEnv* env, size_t size, jboolean* elements = nullptr);
-				
-				virtual ~JavaBooleanArray() = default;
+				java_boolean_array(JNIEnv* env);
+				java_boolean_array(JNIEnv* env, const jbooleanArray& arr);
+				java_boolean_array(JNIEnv* env, size_t size, const jboolean* args = nullptr);
+				java_boolean_array(JNIEnv* env, std::initializer_list<jboolean> args);
 
-				JavaBooleanArray(const JavaBooleanArray& arr);
-				virtual JavaBooleanArray& operator = (jbooleanArray& arr) noexcept override final;
+				virtual ~java_boolean_array() = default;
 
-				virtual JavaObject asObject() const noexcept override final;
+				java_boolean_array(const java_boolean_array& arr);
+				java_boolean_array& operator = (const jbooleanArray& arr);
+				java_boolean_array& operator = (const java_boolean_array& arr);
 
-				JavaBooleanArray region(size_t begin, size_t end) const;
-
-				virtual jbooleanArray getJArray() const noexcept override final;
-				virtual operator jbooleanArray() const noexcept override final;
+				virtual operator java_object() const noexcept override final;
 		};
 
-		class JavaByteArray : public JavaArray<jbyteArray, jbyte> {
+		class java_byte_array : public java_array<jbyteArray, jbyte> {
 			protected:
-				JavaByteArray() = default;
-
+				virtual void release_elements() const noexcept override final;
+			
 			public:
-				JavaByteArray(JNIEnv* env, jbyteArray arr);
-				JavaByteArray(JNIEnv* env, size_t size, jbyte* elements = nullptr);
-				
-				virtual ~JavaByteArray() = default;
+				java_byte_array(JNIEnv* env);
+				java_byte_array(JNIEnv* env, const jbyteArray& arr);
+				java_byte_array(JNIEnv* env, size_t size, const jbyte* args = nullptr);
+				java_byte_array(JNIEnv* env, std::initializer_list<jbyte> args);
 
-				JavaByteArray(const JavaByteArray& arr);
-				virtual JavaByteArray& operator = (jbyteArray& arr) noexcept override final;
+				virtual ~java_byte_array() = default;
 
-				virtual JavaObject asObject() const noexcept override final;
+				java_byte_array(const java_byte_array& arr);
+				java_byte_array& operator = (const jbyteArray& arr);
+				java_byte_array& operator = (const java_byte_array& arr);
 
-				JavaByteArray region(size_t begin, size_t end) const;
-
-				virtual jbyteArray getJArray() const noexcept override final;
-				virtual operator jbyteArray() const noexcept override final;
+				virtual operator java_object() const noexcept override final;
 		};
 
-		class JavaCharArray : public JavaArray<jcharArray, jchar> {
+		class java_short_array : public java_array<jshortArray, jshort> {
 			protected:
-				JavaCharArray() = default;
-
+				virtual void release_elements() const noexcept override final;
+			
 			public:
-				JavaCharArray(JNIEnv* env, jcharArray arr);
-				JavaCharArray(JNIEnv* env, size_t size, jchar* elements = nullptr);
-				JavaCharArray(JNIEnv* env, size_t size, const char* elements);
-				
-				virtual ~JavaCharArray() = default;
+				java_short_array(JNIEnv* env);
+				java_short_array(JNIEnv* env, const jshortArray& arr);
+				java_short_array(JNIEnv* env, size_t size, const jshort* args = nullptr);
+				java_short_array(JNIEnv* env, std::initializer_list<jshort> args);
 
-				JavaCharArray(const JavaCharArray& arr);
-				virtual JavaCharArray& operator = (jcharArray& arr) noexcept override final;
+				virtual ~java_short_array() = default;
 
-				virtual JavaObject asObject() const noexcept override final;
+				java_short_array(const java_short_array& arr);
+				java_short_array& operator = (const jshortArray& arr);
+				java_short_array& operator = (const java_short_array& arr);
 
-				JavaCharArray region(size_t begin, size_t end) const;
-
-				virtual jcharArray getJArray() const noexcept override final;
-				virtual operator jcharArray() const noexcept override final;
+				virtual operator java_object() const noexcept override final;
 		};
 
-		class JavaIntArray : public JavaArray<jintArray, jint> {
+		class java_char_array : public java_array<jcharArray, jchar> {
 			protected:
-				JavaIntArray() = default;
-
+				virtual void release_elements() const noexcept override final;
+			
 			public:
-				JavaIntArray(JNIEnv* env, jintArray arr);
-				JavaIntArray(JNIEnv* env, size_t size, jint* elements = nullptr);
-				
-				virtual ~JavaIntArray() = default;
+				java_char_array(JNIEnv* env);
+				java_char_array(JNIEnv* env, const jcharArray& arr);
+				java_char_array(JNIEnv* env, size_t size, const jchar* args = nullptr);
+				java_char_array(JNIEnv* env, size_t size, const wchar_t* args = nullptr);
+				java_char_array(JNIEnv* env, std::initializer_list<jchar> args);
 
-				JavaIntArray(const JavaIntArray& arr);
-				virtual JavaIntArray& operator = (jintArray& arr) noexcept override final;
+				virtual ~java_char_array() = default;
 
-				virtual JavaObject asObject() const noexcept override final;
+				java_char_array(const java_char_array& arr);
+				java_char_array& operator = (const jcharArray& arr);
+				java_char_array& operator = (const java_char_array& arr);
 
-				JavaIntArray region(size_t begin, size_t end) const;
+				virtual operator java_object() const noexcept override final;
+		};
 
-				virtual jintArray getJArray() const noexcept override final;
-				virtual operator jintArray() const noexcept override final;
+		class java_int_array : public java_array<jintArray, jint> {
+			protected:
+				virtual void release_elements() const noexcept override final;
+			
+			public:
+				java_int_array(JNIEnv* env);
+				java_int_array(JNIEnv* env, const jintArray& arr);
+				java_int_array(JNIEnv* env, size_t size, const jint* args = nullptr);
+				java_int_array(JNIEnv* env, std::initializer_list<jint> args);
+
+				virtual ~java_int_array() = default;
+
+				java_int_array(const java_int_array& arr);
+				java_int_array& operator = (const jintArray& arr);
+				java_int_array& operator = (const java_int_array& arr);
+
+				virtual operator java_object() const noexcept override final;
 		};
 		
-		class JavaLongArray : public JavaArray<jlongArray, jlong> {
+		class java_long_array : public java_array<jlongArray, jlong> {
 			protected:
-				JavaLongArray() = default;
-
+				virtual void release_elements() const noexcept override final;
+			
 			public:
-				JavaLongArray(JNIEnv* env, jlongArray arr);
-				JavaLongArray(JNIEnv* env, size_t size, jlong* elements = nullptr);
-				
-				virtual ~JavaLongArray() = default;
+				java_long_array(JNIEnv* env);
+				java_long_array(JNIEnv* env, const jlongArray& arr);
+				java_long_array(JNIEnv* env, size_t size, const jlong* args = nullptr);
+				java_long_array(JNIEnv* env, std::initializer_list<jlong> args);
 
-				JavaLongArray(const JavaLongArray& arr);
-				virtual JavaLongArray& operator = (jlongArray& arr) noexcept override final;
+				virtual ~java_long_array() = default;
 
-				virtual JavaObject asObject() const noexcept override final;
+				java_long_array(const java_long_array& arr);
+				java_long_array& operator = (const jlongArray& arr);
+				java_long_array& operator = (const java_long_array& arr);
 
-				JavaLongArray region(size_t begin, size_t end) const;
-
-				virtual jlongArray getJArray() const noexcept override final;
-				virtual operator jlongArray() const noexcept override final;
+				virtual operator java_object() const noexcept override final;
 		};
 
-		class JavaFloatArray : public JavaArray<jfloatArray, jfloat> {
+		class java_float_array : public java_array<jfloatArray, jfloat> {
 			protected:
-				JavaFloatArray() = default;
-
+				virtual void release_elements() const noexcept override final;
+			
 			public:
-				JavaFloatArray(JNIEnv* env, jfloatArray arr);
-				JavaFloatArray(JNIEnv* env, size_t size, jfloat* elements = nullptr);
-				
-				virtual ~JavaFloatArray() = default;
+				java_float_array(JNIEnv* env);
+				java_float_array(JNIEnv* env, const jfloatArray& arr);
+				java_float_array(JNIEnv* env, size_t size, const jfloat* args = nullptr);
+				java_float_array(JNIEnv* env, std::initializer_list<jfloat> args);
 
-				JavaFloatArray(const JavaFloatArray& arr);
-				virtual JavaFloatArray& operator = (jfloatArray& arr) noexcept override final;
+				virtual ~java_float_array() = default;
 
-				virtual JavaObject asObject() const noexcept override final;
+				java_float_array(const java_float_array& arr);
+				java_float_array& operator = (const jfloatArray& arr);
+				java_float_array& operator = (const java_float_array& arr);
 
-				JavaFloatArray region(size_t begin, size_t end) const;
-
-				virtual jfloatArray getJArray() const noexcept override final;
-				virtual operator jfloatArray() const noexcept override final;
+				virtual operator java_object() const noexcept override final;
 		};
 
-		class JavaDoubleArray : public JavaArray<jdoubleArray, jdouble> {
+		class java_double_array : public java_array<jdoubleArray, jdouble> {
 			protected:
-				JavaDoubleArray() = default;
-
+				virtual void release_elements() const noexcept override final;
+			
 			public:
-				JavaDoubleArray(JNIEnv* env, jdoubleArray arr);
-				JavaDoubleArray(JNIEnv* env, size_t size, jdouble* elements = nullptr);
-				
-				virtual ~JavaDoubleArray() = default;
+				java_double_array(JNIEnv* env);
+				java_double_array(JNIEnv* env, const jdoubleArray& arr);
+				java_double_array(JNIEnv* env, size_t size, const jdouble* args = nullptr);
+				java_double_array(JNIEnv* env, std::initializer_list<jdouble> args);
 
-				JavaDoubleArray(const JavaDoubleArray& arr);
-				virtual JavaDoubleArray& operator = (jdoubleArray& arr) noexcept override final;
+				virtual ~java_double_array() = default;
 
-				virtual JavaObject asObject() const noexcept override final;
+				java_double_array(const java_double_array& arr);
+				java_double_array& operator = (const jdoubleArray& arr);
+				java_double_array& operator = (const java_double_array& arr);
 
-				JavaDoubleArray region(size_t begin, size_t end) const;
-
-				virtual jdoubleArray getJArray() const noexcept override final;
-				virtual operator jdoubleArray() const noexcept override final;
+				virtual operator java_object() const noexcept override final;
 		};
 	}
 

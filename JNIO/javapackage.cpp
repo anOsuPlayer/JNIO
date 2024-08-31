@@ -2,27 +2,27 @@
 
 namespace jnio {
 
-    JavaPackage::JavaPackage(JNIEnv* env, const std::string& location) {
+    java_package::java_package(JNIEnv* env, const std::string& location) {
 		this->env = env;
 		this->location = location;
     }
     
-    JavaClass JavaPackage::getClass(const char* classname) const {
+    java_class java_package::getClass(const char* classname) const {
         if (classname == nullptr) {
             throw std::invalid_argument("Unable to find a Java Class from a nullptr.");
         }
-        return JavaClass(this->env, *this, classname);
+        return java_class(this->env, *this, classname);
     }
 
-    const std::string& JavaPackage::string() const noexcept {
+    const std::string& java_package::string() const noexcept {
         return this->location;
     }
 
-	const char* JavaPackage::c_str() const noexcept {
+	const char* java_package::c_str() const noexcept {
         return this->location.c_str();
     }
 
-	bool JavaPackage::operator == (const JavaPackage& other) const noexcept {
+	bool java_package::operator == (const java_package& other) const noexcept {
         return this->location == other.location;
     }
 	

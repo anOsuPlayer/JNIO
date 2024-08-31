@@ -2,23 +2,23 @@
 
 namespace jnio {
 
-    JavaObject::JavaObject(JNIEnv* env, const jobject& obj) {
+    java_object::java_object(JNIEnv* env, const jobject& obj) {
         this->env = env;
         this->obj = env->NewWeakGlobalRef(obj);
     }
 
-    JavaObject::~JavaObject() {
+    java_object::~java_object() {
         if (this->obj != nullptr) {
             env->DeleteWeakGlobalRef(this->obj);
         }
     }
 
-	JavaObject::JavaObject(const JavaObject& obj) {
+	java_object::java_object(const java_object& obj) {
         this->env = obj.env;
 		this->obj = env->NewWeakGlobalRef(obj.obj);
     }
 
-	JavaObject& JavaObject::operator = (const JavaObject& other) {
+	java_object& java_object::operator = (const java_object& other) {
         if (this->obj != nullptr) {
             env->DeleteWeakGlobalRef(this->obj);
         }
@@ -28,7 +28,7 @@ namespace jnio {
         return *this;
     }
 
-    JavaObject& JavaObject::operator = (const jobject& other) {
+    java_object& java_object::operator = (const jobject& other) {
         if (this->obj != nullptr) {
             env->DeleteWeakGlobalRef(this->obj);
         }
@@ -37,9 +37,9 @@ namespace jnio {
         return *this;
     }
 
-    JValue JavaObject::_call(JNIEnv* env, jobject obj, const JavaMethod& jm, std::initializer_list<JValue> args) {
-        sign::Signature ret = jm.getSignature().returnType();
-        JValue r;
+    value java_object::_call(JNIEnv* env, jobject obj, const java_method& jm, std::initializer_list<value> args) {
+        sign::signature ret = jm.getSignature().returnType();
+        value r;
 
         switch (ret[0]) {
             case 'Z' : {
@@ -141,13 +141,13 @@ namespace jnio {
         return r;
     }
 
-    JValue JavaObject::call(const JavaMethod& jm, std::initializer_list<JValue> args) const {
-        return JavaObject::_call(this->env, this->obj, jm, args);
+    value java_object::call(const java_method& jm, std::initializer_list<value> args) const {
+        return java_object::_call(this->env, this->obj, jm, args);
     }
 
-    JValue JavaObject::_access(JNIEnv* env, jobject obj, const JavaField& jf) {
+    value java_object::_access(JNIEnv* env, jobject obj, const java_field& jf) {
         const char id = jf.getSignature()[0];
-        JValue r;
+        value r;
 
         switch (id) {
             case 'Z' : {
@@ -195,11 +195,11 @@ namespace jnio {
         return r;
     }
 
-    JValue JavaObject::access(const JavaField& jf) const {
-        return JavaObject::_access(this->env, this->obj, jf);
+    value java_object::access(const java_field& jf) const {
+        return java_object::_access(this->env, this->obj, jf);
     }
 
-    void JavaObject::_edit(JNIEnv* env, jobject obj, const JavaField& jf, const JValue& value) {
+    void java_object::_edit(JNIEnv* env, jobject obj, const java_field& jf, const value& value) {
         const char id = jf.getSignature()[0];
 
         switch (id) {
@@ -247,49 +247,49 @@ namespace jnio {
         }
     }
 
-    void JavaObject::edit(const JavaField& jf, const JValue& value) {
-        return JavaObject::_edit(this->env, this->obj, jf, value);
+    void java_object::edit(const java_field& jf, const value& value) {
+        return java_object::_edit(this->env, this->obj, jf, value);
     }
 
-    JavaClass JavaObject::getClass() const {
+    java_class java_object::getClass() const {
         if (this->getJObject() == nullptr) {
-            throw std::invalid_argument("Unable to call .getClass() method on a null JavaObject.");
+            throw std::invalid_argument("Unable to call .getClass() method on a null java_object.");
         }
 
-        return JavaClass(this->env, env->GetObjectClass(this->obj));
+        return java_class(this->env, env->GetObjectClass(this->obj));
     }
 
-    JavaObject::operator const jobject&() const noexcept {
+    java_object::operator const jobject&() const noexcept {
         return this->obj;
     }
 
-    jobject JavaObject::getJObject() const noexcept {
+    jobject java_object::getJObject() const noexcept {
         return env->NewLocalRef(this->obj);
     }
 
 	static jmethodID TO_STRING;
 
-    std::string JavaObject::string() const noexcept {
+    std::string java_object::string() const noexcept {
         jclass clazz = env->GetObjectClass(this->obj);
 
 		if (TO_STRING == nullptr) {
 			TO_STRING = env->GetMethodID(clazz, "toString", sign::TO_STRING);
 		}
 
-        JavaString str(this->env, (jstring) env->CallObjectMethod(this->obj, TO_STRING));
+        java_string str(this->env, (jstring) env->CallObjectMethod(this->obj, TO_STRING));
         std::string res = str.string();
         env->DeleteLocalRef(clazz);
 
         return res;
     }
 
-	const char* JavaObject::c_str() const noexcept {
+	const char* java_object::c_str() const noexcept {
         return this->string().c_str();
     }
 
 	static jmethodID EQUALS;
 
-    bool JavaObject::operator == (const jobject& other) const noexcept {
+    bool java_object::operator == (const jobject& other) const noexcept {
         jclass clazz = env->GetObjectClass(this->obj);
         
 		if (EQUALS == nullptr) {
@@ -303,27 +303,27 @@ namespace jnio {
         return eq;
     }
 	
-    bool JavaObject::sameType(const jobject& obj) const noexcept {
+    bool java_object::sameType(const jobject& obj) const noexcept {
         return (env->IsInstanceOf(this->obj, env->GetObjectClass(obj)) == 0 ? false : true);
     }
 
-    bool JavaObject::isInstanceof(const jclass& clazz) const noexcept {
+    bool java_object::isInstanceof(const jclass& clazz) const noexcept {
         return (env->IsInstanceOf(this->obj, clazz) == 0 ? false : true);
     }
 
-    JavaObjectArrayElement::JavaObjectArrayElement(JavaObjectArray* ref, size_t refIndex)
-		: JavaObject(ref->env, env->GetObjectArrayElement(ref->arr, refIndex)) {
+    java_object_arrayElement::java_object_arrayElement(java_object_array* ref, size_t refIndex)
+		: java_object(ref->env, env->GetObjectArrayElement(ref->arr, refIndex)) {
         this->ref = ref;
 		this->refIndex = refIndex;
     }
 
-    JavaObjectArrayElement::~JavaObjectArrayElement() {
+    java_object_arrayElement::~java_object_arrayElement() {
         if (this->hasChanged) {
             env->SetObjectArrayElement(this->ref->arr, this->refIndex, this->obj);
         }
     }
 
-	JavaObjectArrayElement& JavaObjectArrayElement::operator = (const JavaObject& obj) {
+	java_object_arrayElement& java_object_arrayElement::operator = (const java_object& obj) {
         this->hasChanged = true;
         if (this->obj != nullptr) {
             env->DeleteWeakGlobalRef(this->obj);
@@ -333,7 +333,7 @@ namespace jnio {
         return *this;
     }
 
-    JavaObjectArrayElement& JavaObjectArrayElement::operator = (const jobject& obj) {
+    java_object_arrayElement& java_object_arrayElement::operator = (const jobject& obj) {
         this->hasChanged = true;
         if (this->obj != nullptr) {
             env->DeleteWeakGlobalRef(this->obj);
@@ -343,17 +343,17 @@ namespace jnio {
         return *this;
     }
 
-    JavaObjectArray::JavaObjectArray(JNIEnv* env, const jobjectArray& arr) {
+    java_object_array::java_object_array(JNIEnv* env, const jobjectArray& arr) {
         this->env = env;
         this->arr = (jobjectArray) env->NewWeakGlobalRef(arr);
     }
 
-    JavaObjectArray::JavaObjectArray(const JavaObjectArray& arr) {
+    java_object_array::java_object_array(const java_object_array& arr) {
 		this->env = env;
         this->arr = (jobjectArray) env->NewWeakGlobalRef(arr.arr);
     }
 
-	JavaObjectArray& JavaObjectArray::operator = (const jobjectArray& arr) {
+	java_object_array& java_object_array::operator = (const jobjectArray& arr) {
         if (this->arr != nullptr) {
             env->DeleteWeakGlobalRef(this->arr);
         }
@@ -362,7 +362,7 @@ namespace jnio {
         return *this;
     }
 
-	JavaObjectArray& JavaObjectArray::operator = (const JavaObjectArray& arr) {
+	java_object_array& java_object_array::operator = (const java_object_array& arr) {
         if (this->arr != nullptr) {
             env->DeleteWeakGlobalRef(this->arr);
         }
@@ -372,7 +372,7 @@ namespace jnio {
         return *this;
     }
 
-    JavaObjectArray::~JavaObjectArray() {
+    java_object_array::~java_object_array() {
         if (this->currentElement != nullptr) {
             delete this->currentElement;
         }
@@ -382,55 +382,55 @@ namespace jnio {
 		}
     }
 
-    JavaObjectArray::operator const jobjectArray&() const noexcept {
+    java_object_array::operator const jobjectArray&() const noexcept {
         return this->arr;
     }
 
-    jobjectArray JavaObjectArray::getJObjectArray() const noexcept {
+    jobjectArray java_object_array::getJObjectArray() const noexcept {
         return (jobjectArray) env->NewLocalRef(this->arr);
     }
 
-    JavaObject JavaObjectArray::asObject() const noexcept {
-        return JavaObject(this->env, this->arr);
+    java_object java_object_array::as_object() const noexcept {
+        return java_object(this->env, this->arr);
     }
 
-    JavaObjectArrayElement& JavaObjectArray::operator [] (size_t index) {
+    java_object_arrayElement& java_object_array::operator [] (size_t index) {
         if (index >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaObjectArray.");
+            throw std::out_of_range("The given index goes out of bounds for this java_object_array.");
         }
 
         if (this->currentElement != nullptr) {
             delete this->currentElement;
         }
-        this->currentElement = new JavaObjectArrayElement(this, index);
+        this->currentElement = new java_object_arrayElement(this, index);
         
         return *this->currentElement;
     }
 
-    size_t JavaObjectArray::length() const noexcept {
+    size_t java_object_array::length() const noexcept {
         return env->GetArrayLength(this->arr);
     }
 
-	static JavaStaticMethod PRINT_ARRAY;
+	static java_static_method PRINT_ARRAY;
 
-	static JavaStaticMethod ARRAY_EQUALS;
+	static java_static_method ARRAY_EQUALS;
 
-    std::string JavaObjectArray::string() const noexcept {
+    std::string java_object_array::string() const noexcept {
         if (PRINT_ARRAY.string().empty()) {
-            JavaClass clazz(this->env, "java/util/Arrays");
-            PRINT_ARRAY = JavaStaticMethod(this->env, "toString", clazz,
-				sign::Method(sign::STRING, { sign::OBJECT_ARRAY }));
+            java_class clazz(this->env, "java/util/Arrays");
+            PRINT_ARRAY = java_static_method(this->env, "toString", clazz,
+				sign::method(sign::STRING, { sign::OBJECT_ARRAY }));
         }
 
-        JavaString str(this->env, (jstring) PRINT_ARRAY.call({ this->arr }));
+        java_string str(this->env, (jstring) PRINT_ARRAY.call({ this->arr }));
         return str.string();
     }
 
-    bool JavaObjectArray::operator == (const jobjectArray& arr) const noexcept {
+    bool java_object_array::operator == (const jobjectArray& arr) const noexcept {
         if (ARRAY_EQUALS.string().empty()) {
-            JavaClass clazz(this->env, "java/util/Arrays");
-            ARRAY_EQUALS = JavaStaticMethod(this->env, "equals", clazz, 
-				sign::Method(sign::BOOLEAN, { sign::OBJECT_ARRAY, sign::OBJECT_ARRAY}));
+            java_class clazz(this->env, "java/util/Arrays");
+            ARRAY_EQUALS = java_static_method(this->env, "equals", clazz, 
+				sign::method(sign::BOOLEAN, { sign::OBJECT_ARRAY, sign::OBJECT_ARRAY}));
         }
 
         bool eq = ((jboolean) ARRAY_EQUALS.call({ this->arr, arr }) == 1) ? true : false;

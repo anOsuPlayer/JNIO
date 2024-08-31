@@ -2,7 +2,7 @@
 
 namespace jnio {
 
-    JavaField::JavaField(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Field& sign) {
+    java_field::java_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign) {
         this->env = env;
         this->clazz = &clazz;
         this->name = name;
@@ -10,51 +10,51 @@ namespace jnio {
         this->field = env->GetFieldID(clazz.getJClass(), name.c_str(), sign);
 
         if (this->field == nullptr) {
-            throw NoSuchFieldException();
+            throw no_such_field();
         }
     }
 
-    JavaField::operator const jfieldID&() const noexcept {
+    java_field::operator const jfieldID&() const noexcept {
         return this->field;
     }
 
-    const jfieldID& JavaField::getJField() const noexcept {
+    const jfieldID& java_field::getJField() const noexcept {
         return this->field;
     }
 
-    const sign::Field& JavaField::getSignature() const noexcept {
+    const sign::field& java_field::getSignature() const noexcept {
         return this->sign;
     }
 
-    JValue JavaField::accessOn(const JavaObject& obj) const {
+    value java_field::accessOn(const java_object& obj) const {
         return obj.access(*this);
     }
 
-    void JavaField::editOn(JavaObject& obj, const JValue& value) {
+    void java_field::editOn(java_object& obj, const value& value) {
         obj.edit(*this, value);
     }
 
-    JValue JavaField::accessOn(jobject obj) const {
-        return JavaObject::_access(this->env, obj, *this);
+    value java_field::accessOn(jobject obj) const {
+        return java_object::_access(this->env, obj, *this);
     }
 
-    void JavaField::editOn(jobject obj, const JValue& value) {
-        JavaObject::_edit(this->env, obj, *this, value);
+    void java_field::editOn(jobject obj, const value& value) {
+        java_object::_edit(this->env, obj, *this, value);
     }
 
-    const std::string& JavaField::string() const noexcept {
+    const std::string& java_field::string() const noexcept {
         return this->name;
     }
 
-	const char* JavaField::c_str() const noexcept {
+	const char* java_field::c_str() const noexcept {
 		return this->name.c_str();
 	}
 
-    bool JavaField::operator == (const JavaField& other) const noexcept {
+    bool java_field::operator == (const java_field& other) const noexcept {
         return this->name == other.name && this->sign == other.sign && this->clazz == other.clazz;
     }
 
-    JavaStaticField::JavaStaticField(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Field& sign) {
+    java_static_field::java_static_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign) {
 		this->env = env;
         this->clazz = &clazz;
         this->name = name;
@@ -62,34 +62,34 @@ namespace jnio {
         this->field = env->GetStaticFieldID(clazz.getJClass(), name.c_str(), sign);
 
         if (this->field == nullptr) {
-            throw NoSuchFieldException();
+            throw no_such_field();
         }
     }
 
-    JValue JavaStaticField::accessOn(const JavaObject& obj) const {
-        throw jnio_exception("Unable to access a JavaStaticField from a JavaObject.");
+    value java_static_field::accessOn(const java_object& obj) const {
+        throw jnio_exception("Unable to access a java_static_field from a java_object.");
     }
 	
-    void JavaStaticField::editOn(JavaObject& obj, const JValue& value) {
-        throw jnio_exception("Unable to edit a JavaStaticField from a JavaObject.");
+    void java_static_field::editOn(java_object& obj, const value& value) {
+        throw jnio_exception("Unable to edit a java_static_field from a java_object.");
     }
 
-    JValue JavaStaticField::accessOn(jobject obj) const {
-        throw jnio_exception("Unable to access a JavaStaticField from a JavaObject.");
+    value java_static_field::accessOn(jobject obj) const {
+        throw jnio_exception("Unable to access a java_static_field from a java_object.");
     }
-    void JavaStaticField::editOn(jobject obj, const JValue& value) {
-        throw jnio_exception("Unable to edit a JavaStaticField from a JavaObject.");
+    void java_static_field::editOn(jobject obj, const value& value) {
+        throw jnio_exception("Unable to edit a java_static_field from a java_object.");
     }
 
-    JValue JavaStaticField::access() const {
+    value java_static_field::access() const {
         return this->clazz->access(*this);
     }
 
-    void JavaStaticField::edit(const JValue& value) const {
+    void java_static_field::edit(const value& value) const {
         this->clazz->edit(*this, value);
     }
 
-	bool JavaStaticField::operator == (const JavaStaticField& other) const noexcept {
+	bool java_static_field::operator == (const java_static_field& other) const noexcept {
         return this->name == other.name && this->field == other.field && this->clazz == other.clazz;
     }
 }

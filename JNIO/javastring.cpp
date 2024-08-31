@@ -2,33 +2,33 @@
 
 namespace jnio {
 
-    JavaString::JavaString(JNIEnv* env) {
+    java_string::java_string(JNIEnv* env) {
         this->env = env;
     }
 
-    JavaString::JavaString(JNIEnv* env, const std::string& str, size_t init, size_t end) {
+    java_string::java_string(JNIEnv* env, const std::string& str, size_t init, size_t end) {
         this->env = env;
 		this->text = str.substr(init, end);
     }
 
-    JavaString::JavaString(JNIEnv* env, JavaCharArray& charr, size_t init, size_t end) {
+    java_string::java_string(JNIEnv* env, java_char_array& charr, size_t init, size_t end) {
 		this->env = env;
 		this->text = std::string((const char*) charr.get_elements()).substr(init, end);
     }
 
-    JavaString::JavaString(JNIEnv* env, const jstring& str, size_t init, size_t end) {
+    java_string::java_string(JNIEnv* env, const jstring& str, size_t init, size_t end) {
         this->env = env;
 		const char* ch = env->GetStringUTFChars(str, &FALSE);
 		this->text = std::string(ch).substr(init, end);
 		env->ReleaseStringUTFChars(str, ch);
     }
 
-    JavaString::JavaString(const JavaString& str, size_t init, size_t end) {
+    java_string::java_string(const java_string& str, size_t init, size_t end) {
         this->env = str.env;
 		this->text = str.text.substr(init, end);
     }
 
-    JavaString& JavaString::operator = (const jstring& str) {
+    java_string& java_string::operator = (const jstring& str) {
         this->text.clear();
 
 		const char* ch = env->GetStringUTFChars(str, &FALSE);
@@ -38,42 +38,42 @@ namespace jnio {
         return *this;
     }
 
-    char& JavaString::operator [] (size_t index) {
+    char& java_string::operator [] (size_t index) {
         if (index >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaString.");
+            throw std::out_of_range("The given index goes out of bounds for this java_string.");
         }
         return this->text[index];
     }
 
-    size_t JavaString::length() const noexcept {
+    size_t java_string::length() const noexcept {
         return this->text.length();
     }
 
-	JavaObject JavaString::asObject() const noexcept {
-        return JavaObject(this->env, *this);
+	java_object java_string::as_object() const noexcept {
+        return java_object(this->env, *this);
     }
 
-    JavaCharArray JavaString::toCharArray() const noexcept {
-        return JavaCharArray(this->env, this->length(), this->text.c_str());
+    java_char_array java_string::toCharArray() const noexcept {
+        return java_char_array(this->env, this->length(), std::wstring(this->text.begin(), this->text.end()).c_str());
     }
 
-	JavaString::operator jstring() const noexcept {
+	java_string::operator jstring() const noexcept {
         return env->NewStringUTF(this->text.c_str());
     }
 
-    const std::string& JavaString::string() const noexcept {
+    const std::string& java_string::string() const noexcept {
         return this->text;
     }
 
-	const char* JavaString::c_str() const noexcept {
+	const char* java_string::c_str() const noexcept {
         return this->text.c_str();
     }
 
-	bool JavaString::operator == (const JavaString& str) const noexcept {
+	bool java_string::operator == (const java_string& str) const noexcept {
         return this->text == str.text;
     }
 
-    bool JavaString::operator == (jstring str) const noexcept {
+    bool java_string::operator == (jstring str) const noexcept {
         const char* ch = env->GetStringUTFChars(str, &FALSE);
 		bool res = this->text == ch;
 		env->ReleaseStringUTFChars(str, ch);

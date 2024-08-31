@@ -8,35 +8,35 @@
 
 	namespace jnio {
 
-		class JavaString {
+		class java_string {
 			private:
 				JNIEnv* env;
 				std::string text;
 
 			public:
-				JavaString(JNIEnv* env);
-				JavaString(JNIEnv* env, const std::string& str, size_t init = 0, size_t chars = std::string::npos);
-				JavaString(JNIEnv* env, JavaCharArray& charr, size_t init = 0, size_t chars = std::string::npos);
-				JavaString(JNIEnv* env, const jstring& str, size_t init = 0, size_t chars = std::string::npos);
+				java_string(JNIEnv* env);
+				java_string(JNIEnv* env, const std::string& str, size_t init = 0, size_t chars = std::string::npos);
+				java_string(JNIEnv* env, java_char_array& charr, size_t init = 0, size_t chars = std::string::npos);
+				java_string(JNIEnv* env, const jstring& str, size_t init = 0, size_t chars = std::string::npos);
 				
-				~JavaString() = default;
+				~java_string() = default;
 
-				JavaString(const JavaString& str, size_t init = 0, size_t chars = std::string::npos);
-				JavaString& operator = (const JavaString& str) = default;
-				JavaString& operator = (const jstring& str);
+				java_string(const java_string& str, size_t init = 0, size_t chars = std::string::npos);
+				java_string& operator = (const java_string& str) = default;
+				java_string& operator = (const jstring& str);
 
 				char& operator [] (size_t index);
 
 				size_t length() const noexcept;
 
-				JavaObject asObject() const noexcept;
+				java_object as_object() const noexcept;
 
 				operator jstring() const noexcept;
-				JavaCharArray toCharArray() const noexcept;
+				java_char_array toCharArray() const noexcept;
 
 				const std::string& string() const noexcept;
 				const char* c_str() const noexcept;
-				bool operator == (const JavaString& str) const noexcept;
+				bool operator == (const java_string& str) const noexcept;
 				bool operator == (jstring str) const noexcept;
 		};
 	}

@@ -9,36 +9,36 @@
 
 	namespace jnio {
 
-		class JValue {
+		class value {
 			private:
 				jvalue val;
 
 			public:
-				JValue() = default;
-				JValue(jboolean z);
-				JValue(jbyte b);
-				JValue(jshort s);
-				JValue(jchar c);
-				JValue(jint i);
-				JValue(jlong j);
-				JValue(jfloat f);
-				JValue(jdouble d);
-				JValue(jobject o);
+				value() = default;
+				value(jboolean z);
+				value(jbyte b);
+				value(jshort s);
+				value(jchar c);
+				value(jint i);
+				value(jlong j);
+				value(jfloat f);
+				value(jdouble d);
+				value(jobject o);
 				
-				~JValue() = default;
+				~value() = default;
 
-				JValue(const JValue& val) = default;
-				JValue& operator = (const JValue& val) = default;
+				value(const value& val) = default;
+				value& operator = (const value& val) = default;
 
-				JValue& operator = (jboolean z) noexcept;
-				JValue& operator = (jbyte b) noexcept;
-				JValue& operator = (jshort s) noexcept;
-				JValue& operator = (jchar c) noexcept;
-				JValue& operator = (jint i) noexcept;
-				JValue& operator = (jlong j) noexcept;
-				JValue& operator = (jfloat f) noexcept;
-				JValue& operator = (jdouble d) noexcept;
-				JValue& operator = (jobject o) noexcept;
+				value& operator = (jboolean z) noexcept;
+				value& operator = (jbyte b) noexcept;
+				value& operator = (jshort s) noexcept;
+				value& operator = (jchar c) noexcept;
+				value& operator = (jint i) noexcept;
+				value& operator = (jlong j) noexcept;
+				value& operator = (jfloat f) noexcept;
+				value& operator = (jdouble d) noexcept;
+				value& operator = (jobject o) noexcept;
 
 				operator jboolean() const noexcept;
 				operator jbyte() const noexcept;
@@ -53,7 +53,7 @@
 
 				operator const jvalue() const noexcept;
 
-				bool operator == (const JValue& val) const noexcept;
+				bool operator == (const value& val) const noexcept;
 		};
 	}
 

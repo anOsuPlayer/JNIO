@@ -4,9 +4,9 @@
 
 namespace jnio {
 
-    class NoSuchFieldException : public jnio_exception {
+    class no_such_field : public jnio_exception {
         public:
-            NoSuchFieldException();
-            explicit NoSuchFieldException(const char* message);
+            no_such_field();
+            explicit no_such_field(const char* message);
     };
 }

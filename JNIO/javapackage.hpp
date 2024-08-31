@@ -8,28 +8,28 @@
 
 	namespace jnio {
 		
-		class JavaClass;
+		class java_class;
 
-		class JavaPackage {
+		class java_package {
 			private:
 				std::string location;
 				JNIEnv* env;
 
 			public:
-				JavaPackage() = delete;
-				explicit JavaPackage(JNIEnv* env, const std::string& location);
+				java_package() = delete;
+				explicit java_package(JNIEnv* env, const std::string& location);
 				
-				~JavaPackage() = default;
+				~java_package() = default;
 
-				JavaPackage(const JavaPackage& pack) = default;
-				JavaPackage& operator = (const JavaPackage& other) = default;
+				java_package(const java_package& pack) = default;
+				java_package& operator = (const java_package& other) = default;
 				
 
-				JavaClass getClass(const char* classname) const;
+				java_class getClass(const char* classname) const;
 
 				const std::string& string() const noexcept;
 				const char* c_str() const noexcept;
-				bool operator == (const JavaPackage& other) const noexcept;
+				bool operator == (const java_package& other) const noexcept;
 		};
 	}
 

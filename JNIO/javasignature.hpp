@@ -8,183 +8,183 @@
 
 	namespace jnio::sign {
 
-		class PureSignature {
+		class pure_signature {
 			protected:
-				std::string signature;
-				PureSignature() = default;
-				PureSignature(const std::string& signature);
+				std::string sign;
+				pure_signature() = default;
+				pure_signature(const std::string& signature);
 
 			public:
-				~PureSignature() = default;
+				~pure_signature() = default;
 
-				PureSignature(const PureSignature& s) = default;
-				PureSignature& operator = (const PureSignature& s) = default;
+				pure_signature(const pure_signature& s) = default;
+				pure_signature& operator = (const pure_signature& s) = default;
 
 				const std::string& string() const noexcept;
 				operator const char*() const noexcept;
-				bool operator == (const PureSignature& other) const noexcept;
+				bool operator == (const pure_signature& other) const noexcept;
 		};
 
-		class Signature : public PureSignature {
+		class signature : public pure_signature {
 			protected:
-				Signature() = default;
+				signature() = default;
 
 			public:
-				Signature(const std::string& signature);
+				signature(const std::string& signature);
 
-				~Signature() = default;
+				~signature() = default;
 
-				Signature(const Signature& s) = default;
-				Signature& operator = (const Signature& s) = default;
+				signature(const signature& s) = default;
+				signature& operator = (const signature& s) = default;
 		};
 
-		const Signature BOOLEAN("Z");
-		const Signature BYTE("B");
-		const Signature CHAR("C");
-		const Signature SHORT("S");
-		const Signature INT("I");
-		const Signature LONG("J");
-		const Signature FLOAT("F");
-		const Signature DOUBLE("D");
+		const signature BOOLEAN("Z");
+		const signature BYTE("B");
+		const signature CHAR("C");
+		const signature SHORT("S");
+		const signature INT("I");
+		const signature LONG("J");
+		const signature FLOAT("F");
+		const signature DOUBLE("D");
 
-		const Signature VOID("V");
+		const signature VOID("V");
 
-		class Args : public Signature {
+		class args : public signature {
 			protected:
-				Args() = default;
+				args() = default;
 
 			public:
-				Args(std::initializer_list<Signature> s);
+				args(std::initializer_list<signature> s);
 
-				~Args() = default;
+				~args() = default;
 
-				Args(const Args& s) = default;
-				Args& operator = (const Args& s) = default;
+				args(const args& s) = default;
+				args& operator = (const args& s) = default;
 
-				Args& operator + (const Signature& ps);
-				Args& operator += (const Signature& ps);
+				args& operator + (const signature& ps);
+				args& operator += (const signature& ps);
 		};
 
-		class Object : public Signature {
+		class object : public signature {
 			protected:
-				Object() = default;
+				object() = default;
 
 			public:
-				Object(const std::string& obj);
+				object(const std::string& obj);
 
-				~Object() = default;
+				~object() = default;
 
-				Object(const Object& os) = default;
-				Object& operator = (const Object& os) = default; 
+				object(const object& os) = default;
+				object& operator = (const object& os) = default; 
 		};
 
-		const Object STRING("java/lang/String");
-		const Object OBJECT("java/lang/Object");
+		const object STRING("java/lang/String");
+		const object OBJECT("java/lang/object");
 
-		class Array : public Signature {
+		class array : public signature {
 			protected:
 				size_t order;
 
 			public:
-				Array() = default;
-				explicit Array(const Signature& base, size_t order = 1);
+				array() = default;
+				explicit array(const signature& base, size_t order = 1);
 				
-				~Array() = default;
+				~array() = default;
 
-				Array(const Array& os) = default;
-				Array& operator = (const Array& os) = default; 
+				array(const array& os) = default;
+				array& operator = (const array& os) = default; 
 
 				size_t get_order() const noexcept;
-				Signature getBaseSignature() const noexcept;
+				signature getBasesignature() const noexcept;
 		};
 
-		const Array BOOLEAN_ARRAY(BOOLEAN);
-		const Array BYTE_ARRAY(BYTE);
-		const Array CHAR_ARRAY(CHAR);
-		const Array SHORT_ARRAY(SHORT);
-		const Array INT_ARRAY(INT);
-		const Array LONG_ARRAY(LONG);
-		const Array FLOAT_ARRAY(FLOAT);
-		const Array DOUBLE_ARRAY(DOUBLE);
+		const array BOOLEAN_ARRAY(BOOLEAN);
+		const array BYTE_ARRAY(BYTE);
+		const array CHAR_ARRAY(CHAR);
+		const array SHORT_ARRAY(SHORT);
+		const array INT_ARRAY(INT);
+		const array LONG_ARRAY(LONG);
+		const array FLOAT_ARRAY(FLOAT);
+		const array DOUBLE_ARRAY(DOUBLE);
 
-		const Array STRING_ARRAY(STRING);
-		const Array OBJECT_ARRAY(OBJECT);
+		const array STRING_ARRAY(STRING);
+		const array OBJECT_ARRAY(OBJECT);
 
-		class Method : public Signature {
+		class method : public signature {
 			public:
-				Method() = default;
-				Method(const std::string& signature);
-				explicit Method(const Signature& returntype);
-				explicit Method(const Signature& returntype, const Args& args);
+				method() = default;
+				method(const std::string& signature);
+				explicit method(const signature& returntype);
+				explicit method(const signature& returntype, const args& args);
 
-				~Method() = default;
+				~method() = default;
 
-				Method(const Method& os) = default;
-				Method& operator = (const Method& os) = default; 
+				method(const method& os) = default;
+				method& operator = (const method& os) = default; 
 
-				Signature returnType() const noexcept;
+				signature returnType() const noexcept;
 			
-			friend class Constructor;
+			friend class constructor;
 		};
 
-		const Method BOOLEAN_METHOD(BOOLEAN);
-		const Method BYTE_METHOD(BYTE);
-		const Method SHORT_METHOD(SHORT);
-		const Method CHAR_METHOD(CHAR);
-		const Method INT_METHOD(INT);
-		const Method LONG_METHOD(LONG);
-		const Method FLOAT_METHOD(FLOAT);
-		const Method DOUBLE_METHOD(DOUBLE);
+		const method BOOLEAN_METHOD(BOOLEAN);
+		const method BYTE_METHOD(BYTE);
+		const method SHORT_METHOD(SHORT);
+		const method CHAR_METHOD(CHAR);
+		const method INT_METHOD(INT);
+		const method LONG_METHOD(LONG);
+		const method FLOAT_METHOD(FLOAT);
+		const method DOUBLE_METHOD(DOUBLE);
 		
-		const Method VOID_METHOD(VOID);
+		const method VOID_METHOD(VOID);
 
-		const Method STRING_METHOD(STRING);
+		const method STRING_METHOD(STRING);
 
-		const Method MAIN(VOID, { STRING_ARRAY });
+		const method MAIN(VOID, { STRING_ARRAY });
 
-		const Method TO_STRING(STRING);
-		const Method EQUALS(BOOLEAN, { OBJECT });
-		const Method HASH_CODE(INT);
-		const Method WAIT(VOID);
-		const Method NOTIFY(VOID);
+		const method TO_STRING(STRING);
+		const method EQUALS(BOOLEAN, { OBJECT });
+		const method HASH_CODE(INT);
+		const method WAIT(VOID);
+		const method NOTIFY(VOID);
 
-		class Constructor : public Method {
+		class constructor : public method {
 			public:
-				Constructor();
-				Constructor(const std::string& signature);
-				explicit Constructor(const Args& args);
+				constructor();
+				constructor(const std::string& signature);
+				explicit constructor(const args& args);
 
-				~Constructor() = default;
+				~constructor() = default;
 
-				Constructor(const Constructor& cs) = default;
-				Constructor& operator = (const Constructor& os) = default; 
+				constructor(const constructor& cs) = default;
+				constructor& operator = (const constructor& os) = default; 
 		};
 
-		const Constructor DEFAULT;
+		const constructor DEFAULT;
 
-		class Field : public Signature {
+		class field : public signature {
 			public:
-				Field() = default;
-				Field(const std::string& signature);
-				explicit Field(const Signature& type);
+				field() = default;
+				field(const std::string& signature);
+				explicit field(const signature& type);
 				
-				~Field() = default;
+				~field() = default;
 
-				Field(const Field& cs) = default;
-				Field& operator = (const Field& os) = default; 
+				field(const field& cs) = default;
+				field& operator = (const field& os) = default; 
 		};
 
-		const Field BOOLEAN_FIELD(BOOLEAN);
-		const Field BYTE_FIELD(BYTE);
-		const Field SHORT_FIELD(SHORT);
-		const Field CHAR_FIELD(CHAR);
-		const Field INT_FIELD(INT);
-		const Field LONG_FIELD(LONG);
-		const Field FLOAT_FIELD(FLOAT);
-		const Field DOUBLE_FIELD(DOUBLE);
+		const field BOOLEAN_FIELD(BOOLEAN);
+		const field BYTE_FIELD(BYTE);
+		const field SHORT_FIELD(SHORT);
+		const field CHAR_FIELD(CHAR);
+		const field INT_FIELD(INT);
+		const field LONG_FIELD(LONG);
+		const field FLOAT_FIELD(FLOAT);
+		const field DOUBLE_FIELD(DOUBLE);
 
-		const Field STRING_FIELD(STRING);
-		const Field OBJECT_FIELD(OBJECT);
+		const field STRING_FIELD(STRING);
+		const field OBJECT_FIELD(OBJECT);
 	}
 
 #endif

@@ -12,69 +12,69 @@
 
 	namespace jnio {
 
-		class JavaClass;
-		class JavaObject;
-		class JavaObjectArray;
+		class java_class;
+		class java_object;
+		class java_object_array;
 
-		class JavaMethod {
+		class java_method {
 			protected:
 				JNIEnv* env;
 				std::string name;
-				const JavaClass* clazz;
-				sign::Method sign;
+				const java_class* clazz;
+				sign::method sign;
 				jmethodID method;
 
 			public:
-				JavaMethod() = default;
-				explicit JavaMethod(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Method& sign);
+				java_method() = default;
+				explicit java_method(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::method& sign);
 				
-				~JavaMethod() = default;
+				~java_method() = default;
 
-				JavaMethod(const JavaMethod& meth) = default;
-				JavaMethod& operator = (const JavaMethod& other) = default;
+				java_method(const java_method& meth) = default;
+				java_method& operator = (const java_method& other) = default;
 
 				const jmethodID& getJMethod() const noexcept;        
 				operator const jmethodID&() const noexcept;
 
-				const sign::Method& getSignature() const noexcept;
+				const sign::method& getSignature() const noexcept;
 
-				virtual JValue callOn(const JavaObject& obj, std::initializer_list<JValue> args = {}) const;
-				virtual JValue callOn(jobject obj, std::initializer_list<JValue> args = {}) const;
+				virtual value callOn(const java_object& obj, std::initializer_list<value> args = {}) const;
+				virtual value callOn(jobject obj, std::initializer_list<value> args = {}) const;
 
 				const std::string& string() const noexcept;
 				const char* c_str() const noexcept;
-				bool operator == (const JavaMethod& other) const noexcept;
+				bool operator == (const java_method& other) const noexcept;
 		};
 
-		class JavaStaticMethod : public JavaMethod {
+		class java_static_method : public java_method {
 			public:
-				JavaStaticMethod() = default;
-				explicit JavaStaticMethod(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Method& sign);
+				java_static_method() = default;
+				explicit java_static_method(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::method& sign);
 				
-				~JavaStaticMethod() = default;
-				JavaStaticMethod& operator = (const JavaStaticMethod& other) = default;
+				~java_static_method() = default;
+				java_static_method& operator = (const java_static_method& other) = default;
 
-				JavaStaticMethod(const JavaStaticMethod& meth);
+				java_static_method(const java_static_method& meth);
 
-				virtual JValue callOn(const JavaObject& obj, std::initializer_list<JValue> args = {}) const override final;
-				virtual JValue callOn(jobject obj, std::initializer_list<JValue> args = {}) const override final;
+				virtual value callOn(const java_object& obj, std::initializer_list<value> args = {}) const override final;
+				virtual value callOn(jobject obj, std::initializer_list<value> args = {}) const override final;
 				
-				JValue call(std::initializer_list<JValue> args = {}) const;
+				value call(std::initializer_list<value> args = {}) const;
 		};
 
-		class JavaConstructor : public JavaMethod {
+		class java_constructor : public java_method {
 			public:
-				JavaConstructor() = default;
-				explicit JavaConstructor(JNIEnv* env, const JavaClass& clazz, const sign::Constructor& cs);
-				explicit JavaConstructor(JNIEnv* env, const JavaClass& clazz);
+				java_constructor() = default;
+				explicit java_constructor(JNIEnv* env, const java_class& clazz, const sign::constructor& cs);
+				explicit java_constructor(JNIEnv* env, const java_class& clazz);
 				
-				~JavaConstructor() = default;
+				~java_constructor() = default;
 
-				JavaConstructor(const JavaConstructor& con);
-				JavaConstructor& operator = (const JavaConstructor& other) = default;
+				java_constructor(const java_constructor& con);
+				java_constructor& operator = (const java_constructor& other) = default;
 
-				JavaObject newInstance(std::initializer_list<JValue> args = {}) const;
-				JavaObjectArray newArray(size_t length) const;
+				java_object newInstance(std::initializer_list<value> args = {}) const;
+				java_object_array newArray(size_t length) const;
 		};
 	}
 

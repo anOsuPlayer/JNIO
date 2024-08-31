@@ -3,396 +3,560 @@
 
 namespace jnio {
 
-    JavaBooleanArray::JavaBooleanArray(JNIEnv* env, jbooleanArray arr) : JavaArray(env, env->GetArrayLength(arr)) {
-        env->GetBooleanArrayRegion(arr, 0, env->GetArrayLength(arr), this->elements);
-    }
+	void java_boolean_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetBooleanArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
 
-    JavaBooleanArray::JavaBooleanArray(JNIEnv* env, size_t size, jboolean* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
+	java_boolean_array::java_boolean_array(JNIEnv* env) : java_boolean_array(env, (size_t) 0) {
 
-    JavaBooleanArray::JavaBooleanArray(const JavaBooleanArray& arr) : JavaArray(arr.env, arr.length()) {
-        for (size_t i = 0; i < this->size; i++) {
-            this->elements[i] = arr.elements[i];
-        }
-    }
-
-    JavaObject JavaBooleanArray::asObject() const noexcept {
-        return JavaObject(this->env, this->getJArray());
-    }
-
-    JavaBooleanArray& JavaBooleanArray::operator = (jbooleanArray& arr) noexcept {
-        if (this->elements != nullptr) {
-            delete[] this->elements;
-        }
-        this->size = env->GetArrayLength(arr);
-        this->elements = new jboolean[this->size];
-        env->GetBooleanArrayRegion(arr, 0, this->size, this->elements);
-
-        return *this;
-    }
-
-    JavaBooleanArray JavaBooleanArray::region(size_t begin, size_t len) const {
-        if (begin >= this->length() || len >= this->length() || begin+len >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaBooleanArray.");
-        }
-        JavaBooleanArray arr(this->env, len);
-        for (size_t i = 0; i < len; i++) {
-            arr[i] = this->elements[begin+i];
-        }
-
-        return arr;
-    }
-
-    jbooleanArray JavaBooleanArray::getJArray() const noexcept {
-        jbooleanArray arr = env->NewBooleanArray(this->length());
-        env->SetBooleanArrayRegion(arr, 0, this->length(), this->elements);
-        return arr;
-    }
-
-    JavaBooleanArray::operator jbooleanArray() const noexcept {
-        return this->getJArray();
-    }
-
-    JavaByteArray::JavaByteArray(JNIEnv* env, jbyteArray arr) : JavaArray(env, env->GetArrayLength(arr)) {
-        env->GetByteArrayRegion(arr, 0, env->GetArrayLength(arr), this->elements);
-    }
-
-    JavaByteArray::JavaByteArray(JNIEnv* env, size_t size, jbyte* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
-
-    JavaByteArray::JavaByteArray(const JavaByteArray& arr) : JavaArray(arr.env, arr.length()) {
-        for (size_t i = 0; i < this->size; i++) {
-            this->elements[i] = arr.elements[i];
-        }
-    }
-
-    JavaObject JavaByteArray::asObject() const noexcept {
-        return JavaObject(this->env, this->getJArray());
-    }
-
-    JavaByteArray& JavaByteArray::operator = (jbyteArray& arr) noexcept {
-        if (this->elements != nullptr) {
-            delete[] this->elements;
-        }
-        this->size = env->GetArrayLength(arr);
-        this->elements = new jbyte[this->size];
-        env->GetByteArrayRegion(arr, 0, this->size, this->elements);
-
-        return *this;
-    }
-
-    JavaByteArray JavaByteArray::region(size_t begin, size_t len) const {
-        if (begin >= this->length() || len >= this->length() || begin+len >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaByteArray.");
-        }
-        JavaByteArray arr(this->env, len);
-        for (size_t i = 0; i < len; i++) {
-            arr[i] = this->elements[begin+i];
-        }
-
-        return arr;
-    }
-
-    jbyteArray JavaByteArray::getJArray() const noexcept {
-        jbyteArray arr = env->NewByteArray(this->length());
-        env->SetByteArrayRegion(arr, 0, this->length(), this->elements);
-        return arr;
-    }
-
-    JavaByteArray::operator jbyteArray() const noexcept {
-        return this->getJArray();
-    }
-
-    JavaCharArray::JavaCharArray(JNIEnv* env, jcharArray arr) : JavaArray(env, env->GetArrayLength(arr)) {
-        env->GetCharArrayRegion(arr, 0, env->GetArrayLength(arr), this->elements);
-    }
+	}
 	
-    JavaCharArray::JavaCharArray(JNIEnv* env, size_t size, jchar* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
+	java_boolean_array::java_boolean_array(JNIEnv* env, const jbooleanArray& arr) : java_array(env) {
+		this->arr = arr;
 
-    JavaCharArray::JavaCharArray(JNIEnv* env, size_t size, const char* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jboolean*) malloc(size * sizeof(jboolean));
+		env->GetBooleanArrayRegion(arr, 0, size, this->elements);
+	}
 
-    JavaCharArray::JavaCharArray(const JavaCharArray& arr) : JavaArray(arr.env, arr.length()) {
-        for (size_t i = 0; i < this->size; i++) {
-            this->elements[i] = arr.elements[i];
-        }
-    }
+	java_boolean_array::java_boolean_array(JNIEnv* env, size_t size, const jboolean* args) : java_array(env) {
+		this->arr = env->NewBooleanArray(size);
 
-    JavaObject JavaCharArray::asObject() const noexcept {
-        return JavaObject(this->env, this->getJArray());
-    }
+		this->elements = (jboolean*) malloc(size * sizeof(jboolean));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jboolean));
+		}
 
-    JavaCharArray& JavaCharArray::operator = (jcharArray& arr) noexcept {
-        if (this->elements != nullptr) {
-            delete[] this->elements;
-        }
-        this->size = env->GetArrayLength(arr);
-        this->elements = new jchar[this->size];
-        env->GetCharArrayRegion(arr, 0, this->size, this->elements);
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
 
-        return *this;
-    }
+	java_boolean_array::java_boolean_array(JNIEnv* env, std::initializer_list<jboolean> args) : java_array(env) {
+		this->arr = env->NewBooleanArray(args.size());
 
-    JavaCharArray JavaCharArray::region(size_t begin, size_t len) const {
-        if (begin >= this->length() || len >= this->length() || begin+len >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaCharArray.");
-        }
-        JavaCharArray arr(this->env, len);
-        for (size_t i = 0; i < len; i++) {
-            arr[i] = this->elements[begin+i];
-        }
+		this->elements = (jboolean*) malloc(args.size() * sizeof(jboolean));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jboolean));
+	}
 
-        return arr;
-    }
-
-    jcharArray JavaCharArray::getJArray() const noexcept {
-        jcharArray arr = env->NewCharArray(this->length());
-        env->SetCharArrayRegion(arr, 0, this->length(), this->elements);
-        return arr;
-    }
-
-    JavaCharArray::operator jcharArray() const noexcept {
-        return this->getJArray();
-    }
-
-    JavaIntArray::JavaIntArray(JNIEnv* env, jintArray arr) : JavaArray(env, env->GetArrayLength(arr)) {
-        env->GetIntArrayRegion(arr, 0, env->GetArrayLength(arr), this->elements);
-    }
-
-    JavaIntArray::JavaIntArray(JNIEnv* env, size_t size, jint* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
-
-    JavaIntArray::JavaIntArray(const JavaIntArray& arr) : JavaArray(arr.env, arr.length()) {
-        for (size_t i = 0; i < this->size; i++) {
-            this->elements[i] = arr.elements[i];
-        }
-    }
-
-    JavaObject JavaIntArray::asObject() const noexcept {
-        return JavaObject(this->env, this->getJArray());
-    }
-
-    JavaIntArray& JavaIntArray::operator = (jintArray& arr) noexcept {
-        if (this->elements != nullptr) {
-            delete[] this->elements;
-        }
-        this->size = env->GetArrayLength(arr);
-        this->elements = new jint[this->size];
-        env->GetIntArrayRegion(arr, 0, this->size, this->elements);
-
-        return *this;
-    }
-
-    JavaIntArray JavaIntArray::region(size_t begin, size_t len) const {
-        if (begin >= this->length() || len >= this->length() || begin+len >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaIntArray.");
-        }
-        JavaIntArray arr(this->env, len);
-        for (size_t i = 0; i < len; i++) {
-            arr[i] = this->elements[begin+i];
-        }
-
-        return arr;
-    }
-
-    jintArray JavaIntArray::getJArray() const noexcept {
-        jintArray arr = env->NewIntArray(this->length());
-        env->SetIntArrayRegion(arr, 0, this->length(), this->elements);
-        return arr;
-    }
-
-    JavaIntArray::operator jintArray() const noexcept {
-        return this->getJArray();
-    }
-
-    JavaLongArray::JavaLongArray(JNIEnv* env, jlongArray arr) : JavaArray(env, env->GetArrayLength(arr)) {
-        env->GetLongArrayRegion(arr, 0, env->GetArrayLength(arr), this->elements);
-    }
+	java_boolean_array::java_boolean_array(const java_boolean_array& arr) : java_boolean_array(arr.env, arr.length(), arr.elements) {
+		
+	}
 	
-    JavaLongArray::JavaLongArray(JNIEnv* env, size_t size, jlong* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
+	java_boolean_array& java_boolean_array::operator = (const java_boolean_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jboolean*) malloc(size * sizeof(jboolean));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jboolean));
 
-    JavaLongArray::JavaLongArray(const JavaLongArray& arr) : JavaArray(arr.env, arr.length()) {
-        for (size_t i = 0; i < this->size; i++) {
-            this->elements[i] = arr.elements[i];
-        }
-    }
+		return *this;
+	}
 
-    JavaObject JavaLongArray::asObject() const noexcept {
-        return JavaObject(this->env, this->getJArray());
-    }
+	java_boolean_array& java_boolean_array::operator = (const jbooleanArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jboolean*) malloc(size * sizeof(jboolean));
+		env->GetBooleanArrayRegion(arr, 0, size, this->elements);
 
-    JavaLongArray& JavaLongArray::operator = (jlongArray& arr) noexcept {
-        if (this->elements != nullptr) {
-            delete[] this->elements;
-        }
-        this->size = env->GetArrayLength(arr);
-        this->elements = new jlong[this->size];
-        env->GetLongArrayRegion(arr, 0, this->size, this->elements);
+		return *this;
+	}
 
-        return *this;
-    }
+	java_boolean_array::operator java_object() const noexcept {
+		return java_object(this->env, (jbooleanArray) *this);
+	}
 
-    JavaLongArray JavaLongArray::region(size_t begin, size_t len) const {
-        if (begin >= this->length() || len >= this->length() || begin+len >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaLongArray.");
-        }
-        JavaLongArray arr(this->env, len);
-        for (size_t i = 0; i < len; i++) {
-            arr[i] = this->elements[begin+i];
-        }
+	void java_byte_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetByteArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
 
-        return arr;
-    }
+	java_byte_array::java_byte_array(JNIEnv* env) : java_byte_array(env, (size_t) 0) {
 
-    jlongArray JavaLongArray::getJArray() const noexcept {
-        jlongArray arr = env->NewLongArray(this->length());
-        env->SetLongArrayRegion(arr, 0, this->length(), this->elements);
-        return arr;
-    }
-
-    JavaLongArray::operator jlongArray() const noexcept {
-        return this->getJArray();
-    }
-
-    JavaFloatArray::JavaFloatArray(JNIEnv* env, jfloatArray arr) : JavaArray(env, env->GetArrayLength(arr)) {
-        env->GetFloatArrayRegion(arr, 0, env->GetArrayLength(arr), this->elements);
-    }
+	}
 	
-    JavaFloatArray::JavaFloatArray(JNIEnv* env, size_t size, jfloat* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
+	java_byte_array::java_byte_array(JNIEnv* env, const jbyteArray& arr) : java_array(env) {
+		this->arr = arr;
 
-    JavaFloatArray::JavaFloatArray(const JavaFloatArray& arr) : JavaArray(arr.env, arr.length()) {
-        for (size_t i = 0; i < this->size; i++) {
-            this->elements[i] = arr.elements[i];
-        }
-    }
-    
-    JavaObject JavaFloatArray::asObject() const noexcept {
-        return JavaObject(this->env, this->getJArray());
-    }
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jbyte*) malloc(size * sizeof(jbyte));
+		env->GetByteArrayRegion(arr, 0, size, this->elements);
+	}
 
-    JavaFloatArray& JavaFloatArray::operator = (jfloatArray& arr) noexcept {
-        if (this->elements != nullptr) {
-            delete[] this->elements;
-        }
-        this->size = env->GetArrayLength(arr);
-        this->elements = new jfloat[this->size];
-        env->GetFloatArrayRegion(arr, 0, this->size, this->elements);
+	java_byte_array::java_byte_array(JNIEnv* env, size_t size, const jbyte* args) : java_array(env) {
+		this->arr = env->NewByteArray(size);
 
-        return *this;
-    }
+		this->elements = (jbyte*) malloc(size * sizeof(jbyte));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jbyte));
+		}
 
-    JavaFloatArray JavaFloatArray::region(size_t begin, size_t len) const {
-        if (begin >= this->length() || len >= this->length() || begin+len >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaFloatArray.");
-        }
-        JavaFloatArray arr(this->env, len);
-        for (size_t i = 0; i < len; i++) {
-            arr[i] = this->elements[begin+i];
-        }
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
 
-        return arr;
-    }
+	java_byte_array::java_byte_array(JNIEnv* env, std::initializer_list<jbyte> args) : java_array(env) {
+		this->arr = env->NewByteArray(args.size());
 
-    jfloatArray JavaFloatArray::getJArray() const noexcept {
-        jfloatArray arr = env->NewFloatArray(this->length());
-        env->SetFloatArrayRegion(arr, 0, this->length(), this->elements);
-        return arr;
-    }
+		this->elements = (jbyte*) malloc(args.size() * sizeof(jbyte));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jbyte));
+	}
 
-    JavaFloatArray::operator jfloatArray() const noexcept {
-        return this->getJArray();
-    }
+	java_byte_array::java_byte_array(const java_byte_array& arr) : java_byte_array(arr.env, arr.length(), arr.elements) {
+		
+	}
 
-    JavaDoubleArray::JavaDoubleArray(JNIEnv* env, jdoubleArray arr) : JavaArray(env, env->GetArrayLength(arr)) {
-        env->GetDoubleArrayRegion(arr, 0, env->GetArrayLength(arr), this->elements);
-    }
+	java_byte_array& java_byte_array::operator = (const java_byte_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jbyte*) malloc(size * sizeof(jbyte));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jbyte));
 
-    JavaDoubleArray::JavaDoubleArray(JNIEnv* env, size_t size, jdouble* elements) : JavaArray(env, size) {
-        if (elements != nullptr) {
-            for (size_t i = 0; i < size; i++) {
-                this->elements[i] = elements[i];
-            }
-        }
-    }
+		return *this;
+	}
 
-    JavaDoubleArray::JavaDoubleArray(const JavaDoubleArray& arr) : JavaArray(arr.env, arr.length()) {
-        for (size_t i = 0; i < this->size; i++) {
-            this->elements[i] = arr.elements[i];
-        }
-    }
+	java_byte_array& java_byte_array::operator = (const jbyteArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jbyte*) malloc(size * sizeof(jbyte));
+		env->GetByteArrayRegion(arr, 0, size, this->elements);
 
-    JavaObject JavaDoubleArray::asObject() const noexcept {
-        return JavaObject(this->env, this->getJArray());
-    }
+		return *this;
+	}
 
-    JavaDoubleArray& JavaDoubleArray::operator = (jdoubleArray& arr) noexcept {
-        if (this->elements != nullptr) {
-            delete[] this->elements;
-        }
-        this->size = env->GetArrayLength(arr);
-        this->elements = new jdouble[this->size];
-        env->GetDoubleArrayRegion(arr, 0, this->size, this->elements);
+	java_byte_array::operator java_object() const noexcept {
+		return java_object(this->env, (jbyteArray) *this);
+	}
 
-        return *this;
-    }
+	void java_short_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetShortArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
 
-    JavaDoubleArray JavaDoubleArray::region(size_t begin, size_t len) const {
-        if (begin >= this->length() || len >= this->length() || begin+len >= this->length()) {
-            throw std::out_of_range("The given index goes out of bounds for this JavaDoubleArray.");
-        }
-        JavaDoubleArray arr(this->env, len);
-        for (size_t i = 0; i < len; i++) {
-            arr[i] = this->elements[begin+i];
-        }
+	java_short_array::java_short_array(JNIEnv* env) : java_short_array(env, (size_t) 0) {
 
-        return arr;
-    }
+	}
+	
+	java_short_array::java_short_array(JNIEnv* env, const jshortArray& arr) : java_array(env) {
+		this->arr = arr;
 
-    jdoubleArray JavaDoubleArray::getJArray() const noexcept {
-        jdoubleArray arr = env->NewDoubleArray(this->length());
-        env->SetDoubleArrayRegion(arr, 0, this->length(), this->elements);
-        return arr;
-    }
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jshort*) malloc(size * sizeof(jshort));
+		env->GetShortArrayRegion(arr, 0, size, this->elements);
+	}
 
-    JavaDoubleArray::operator jdoubleArray() const noexcept {
-        return this->getJArray();
-    }
+	java_short_array::java_short_array(JNIEnv* env, size_t size, const jshort* args) : java_array(env) {
+		this->arr = env->NewShortArray(size);
+
+		this->elements = (jshort*) malloc(size * sizeof(jshort));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jshort));
+		}
+
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
+
+	java_short_array::java_short_array(JNIEnv* env, std::initializer_list<jshort> args) : java_array(env) {
+		this->arr = env->NewShortArray(args.size());
+
+		this->elements = (jshort*) malloc(args.size() * sizeof(jshort));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jshort));
+	}
+
+	java_short_array::java_short_array(const java_short_array& arr) : java_short_array(arr.env, arr.length(), arr.elements) {
+		
+	}
+
+	java_short_array& java_short_array::operator = (const java_short_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jshort*) malloc(size * sizeof(jshort));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jshort));
+
+		return *this;
+	}
+
+	java_short_array& java_short_array::operator = (const jshortArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jshort*) malloc(size * sizeof(jshort));
+		env->GetShortArrayRegion(arr, 0, size, this->elements);
+
+		return *this;
+	}
+
+	java_short_array::operator java_object() const noexcept {
+		return java_object(this->env, (jshortArray) *this);
+	}
+
+	void java_char_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetCharArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
+
+	java_char_array::java_char_array(JNIEnv* env) : java_char_array(env, (size_t) 0, (jchar*) nullptr) {
+
+	}
+	
+	java_char_array::java_char_array(JNIEnv* env, const jcharArray& arr) : java_array(env) {
+		this->arr = arr;
+
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jchar*) malloc(size * sizeof(jchar));
+		env->GetCharArrayRegion(arr, 0, size, this->elements);
+	}
+
+	java_char_array::java_char_array(JNIEnv* env, size_t size, const jchar* args) : java_array(env) {
+		this->arr = env->NewCharArray(size);
+
+		this->elements = (jchar*) malloc(size * sizeof(jchar));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jchar));
+		}
+
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
+	
+	java_char_array::java_char_array(JNIEnv* env, size_t size, const wchar_t* args) : java_array(env) {
+		this->arr = env->NewCharArray(size);
+
+		this->elements = (jchar*) malloc(size * sizeof(jchar));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jchar));
+		}
+
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
+
+	java_char_array::java_char_array(JNIEnv* env, std::initializer_list<jchar> args) : java_array(env) {
+		this->arr = env->NewCharArray(args.size());
+
+		this->elements = (jchar*) malloc(args.size() * sizeof(jchar));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jchar));
+	}
+
+	java_char_array::java_char_array(const java_char_array& arr) : java_char_array(arr.env, arr.length(), arr.elements) {
+		
+	}
+
+	java_char_array& java_char_array::operator = (const java_char_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jchar*) malloc(size * sizeof(jchar));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jchar));
+
+		return *this;
+	}
+
+	java_char_array& java_char_array::operator = (const jcharArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jchar*) malloc(size * sizeof(jchar));
+		env->GetCharArrayRegion(arr, 0, size, this->elements);
+		
+		return *this;
+	}
+
+	java_char_array::operator java_object() const noexcept {
+		return java_object(this->env, (jcharArray) *this);
+	}
+
+	void java_int_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetIntArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
+
+	java_int_array::java_int_array(JNIEnv* env) : java_int_array(env, (size_t) 0) {
+
+	}
+	
+	java_int_array::java_int_array(JNIEnv* env, const jintArray& arr) : java_array(env) {
+		this->arr = arr;
+
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jint*) malloc(size * sizeof(jint));
+		env->GetIntArrayRegion(arr, 0, size, this->elements);
+	}
+
+	java_int_array::java_int_array(JNIEnv* env, size_t size, const jint* args) : java_array(env) {
+		this->arr = env->NewIntArray(size);
+
+		this->elements = (jint*) malloc(size * sizeof(jint));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jint));
+		}
+
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
+
+	java_int_array::java_int_array(JNIEnv* env, std::initializer_list<jint> args) : java_array(env) {
+		this->arr = env->NewIntArray(args.size());
+
+		this->elements = (jint*) malloc(args.size() * sizeof(jint));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jint));
+	}
+
+	java_int_array::java_int_array(const java_int_array& arr) : java_int_array(arr.env, arr.length(), arr.elements) {
+		
+	}
+
+	java_int_array& java_int_array::operator = (const java_int_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jint*) malloc(size * sizeof(jint));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jint));
+
+		return *this;
+	}
+
+	java_int_array& java_int_array::operator = (const jintArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jint*) malloc(size * sizeof(jint));
+		env->GetIntArrayRegion(arr, 0, size, this->elements);
+
+		return *this;
+	}
+
+	java_int_array::operator java_object() const noexcept {
+		return java_object(this->env, (jintArray) *this);
+	}
+
+	void java_long_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetLongArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
+
+	java_long_array::java_long_array(JNIEnv* env) : java_long_array(env, (size_t) 0) {
+
+	}
+	
+	java_long_array::java_long_array(JNIEnv* env, const jlongArray& arr) : java_array(env) {
+		this->arr = arr;
+
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jlong*) malloc(size * sizeof(jlong));
+		env->GetLongArrayRegion(arr, 0, size, this->elements);
+	}
+
+	java_long_array::java_long_array(JNIEnv* env, size_t size, const jlong* args) : java_array(env) {
+		this->arr = env->NewLongArray(size);
+
+		this->elements = (jlong*) malloc(size * sizeof(jlong));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jlong));
+		}
+
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
+
+	java_long_array::java_long_array(JNIEnv* env, std::initializer_list<jlong> args) : java_array(env) {
+		this->arr = env->NewLongArray(args.size());
+
+		this->elements = (jlong*) malloc(args.size() * sizeof(jlong));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jlong));
+	}
+
+	java_long_array::java_long_array(const java_long_array& arr) : java_long_array(arr.env, arr.length(), arr.elements) {
+		
+	}
+
+	java_long_array& java_long_array::operator = (const java_long_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jlong*) malloc(size * sizeof(jlong));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jlong));
+
+		return *this;
+	}
+
+	java_long_array& java_long_array::operator = (const jlongArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jlong*) malloc(size * sizeof(jlong));
+		env->GetLongArrayRegion(arr, 0, size, this->elements);
+
+		return *this;
+	}
+
+	java_long_array::operator java_object() const noexcept {
+		return java_object(this->env, (jlongArray) *this);
+	}
+
+	void java_float_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetFloatArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
+
+	java_float_array::java_float_array(JNIEnv* env) : java_float_array(env, (size_t) 0) {
+
+	}
+	
+	java_float_array::java_float_array(JNIEnv* env, const jfloatArray& arr) : java_array(env) {
+		this->arr = arr;
+
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jfloat*) malloc(size * sizeof(jfloat));
+		env->GetFloatArrayRegion(arr, 0, size, this->elements);
+	}
+
+	java_float_array::java_float_array(JNIEnv* env, size_t size, const jfloat* args) : java_array(env) {
+		this->arr = env->NewFloatArray(size);
+
+		this->elements = (jfloat*) malloc(size * sizeof(jfloat));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jfloat));
+		}
+
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
+
+	java_float_array::java_float_array(JNIEnv* env, std::initializer_list<jfloat> args) : java_array(env) {
+		this->arr = env->NewFloatArray(args.size());
+
+		this->elements = (jfloat*) malloc(args.size() * sizeof(jfloat));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jfloat));
+	}
+
+	java_float_array::java_float_array(const java_float_array& arr) : java_float_array(arr.env, arr.length(), arr.elements) {
+		
+	}
+
+	java_float_array& java_float_array::operator = (const java_float_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jfloat*) malloc(size * sizeof(jfloat));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jfloat));
+
+		return *this;
+	}
+
+	java_float_array& java_float_array::operator = (const jfloatArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jfloat*) malloc(size * sizeof(jfloat));
+		env->GetFloatArrayRegion(arr, 0, size, this->elements);
+
+		return *this;
+	}
+
+	java_float_array::operator java_object() const noexcept {
+		return java_object(this->env, (jfloatArray) *this);
+	}
+
+	void java_double_array::release_elements() const noexcept {
+		if (this->elements != nullptr) {
+			env->SetDoubleArrayRegion(this->arr, 0, env->GetArrayLength(this->arr), this->elements);
+		}
+	}
+
+	java_double_array::java_double_array(JNIEnv* env) : java_double_array(env, (size_t) 0) {
+
+	}
+	
+	java_double_array::java_double_array(JNIEnv* env, const jdoubleArray& arr) : java_array(env) {
+		this->arr = arr;
+
+		size_t size = env->GetArrayLength(arr);
+		this->elements = (jdouble*) malloc(size * sizeof(jdouble));
+		env->GetDoubleArrayRegion(arr, 0, size, this->elements);
+	}
+
+	java_double_array::java_double_array(JNIEnv* env, size_t size, const jdouble* args) : java_array(env) {
+		this->arr = env->NewDoubleArray(size);
+
+		this->elements = (jdouble*) malloc(size * sizeof(jdouble));
+		if (args != nullptr) {
+			memcpy(this->elements, args, size * sizeof(jdouble));
+		}
+
+		for (size_t i = 0; i < size; i++) {
+			this->elements[i] = 0;
+		}
+	}
+
+	java_double_array::java_double_array(JNIEnv* env, std::initializer_list<jdouble> args) : java_array(env) {
+		this->arr = env->NewDoubleArray(args.size());
+
+		this->elements = (jdouble*) malloc(args.size() * sizeof(jdouble));
+		memcpy(this->elements, args.begin(), args.size() * sizeof(jdouble));
+	}
+
+	java_double_array::java_double_array(const java_double_array& arr) : java_double_array(arr.env, arr.length(), arr.elements) {
+		
+	}
+	
+	java_double_array& java_double_array::operator = (const java_double_array& arr) {
+		size_t size = arr.length();
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jdouble*) malloc(size * sizeof(jdouble));
+		memcpy(this->elements, arr.get_elements(), size * sizeof(jdouble));
+
+		return *this;
+	}
+
+	java_double_array& java_double_array::operator = (const jdoubleArray& arr) {
+		size_t size = env->GetArrayLength(arr);
+		if (this->elements != nullptr) {
+			free(this->elements);
+		}
+		this->elements = (jdouble*) malloc(size * sizeof(jdouble));
+		env->GetDoubleArrayRegion(arr, 0, size, this->elements);
+
+		return *this;
+	}
+
+	java_double_array::operator java_object() const noexcept {
+		return java_object(this->env, (jdoubleArray) *this);
+	}
 }

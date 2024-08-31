@@ -2,117 +2,117 @@
 
 namespace jnio::sign {
 
-    PureSignature::PureSignature(const std::string& s) {
-		this->signature = s;
+    pure_signature::pure_signature(const std::string& s) {
+		this->sign = s;
     }
 
-	PureSignature::operator const char*() const noexcept {
-		return this->signature.c_str();
+	pure_signature::operator const char*() const noexcept {
+		return this->sign.c_str();
 	}
 
-	const std::string& PureSignature::string() const noexcept {
-		return this->signature;
+	const std::string& pure_signature::string() const noexcept {
+		return this->sign;
 	}
 
-	bool PureSignature::operator == (const PureSignature& s) const noexcept {
-		return this->signature == s.signature;
+	bool pure_signature::operator == (const pure_signature& s) const noexcept {
+		return this->sign == s.sign;
 	}
 
-	Signature::Signature(const std::string& signature) : PureSignature(signature) {
+	signature::signature(const std::string& signature) : pure_signature(signature) {
 
 	}
 
-	Args::Args(std::initializer_list<Signature> s) {
+	args::args(std::initializer_list<signature> s) {
 		for (auto it = s.begin(); it != s.end(); it++) {
 			*this += *it;
 		}
 	}
 
-	Args& Args::operator + (const Signature& s) {
+	args& args::operator + (const signature& s) {
         if (s == VOID) {
-            throw std::invalid_argument("A Void Signature cannot be part of a Args.");
+            throw std::invalid_argument("A Void signature cannot be part of a args.");
         }
-		this->signature += s.string();
+		this->sign += s.string();
 
         return *this;
     }
 
-    Args& Args::operator += (const Signature& s) {
+    args& args::operator += (const signature& s) {
         return *this + s;
     }
 
-    Object::Object(const std::string& s) : Signature(s) {
-        if (this->signature[0] != 'L' || this->signature[0] != '[') {
-			this->signature = 'L' + this->signature;
+    object::object(const std::string& s) : signature(s) {
+        if (this->sign[0] != 'L' || this->sign[0] != '[') {
+			this->sign = 'L' + this->sign;
 		}
-		if (this->signature[this->signature.size()-1] != ';') {
-			this->signature += ';';
+		if (this->sign[this->sign.size()-1] != ';') {
+			this->sign += ';';
 		}
 
-        for (size_t i = 1; i < this->signature.size(); i++) {
-            this->signature[i] = (this->signature[i] == '.') ? '/' : this->signature[i];
+        for (size_t i = 1; i < this->sign.size(); i++) {
+            this->sign[i] = (this->sign[i] == '.') ? '/' : this->sign[i];
         }
     }
 
-    Array::Array(const Signature& base, size_t order) {
+    array::array(const signature& base, size_t order) {
         if (order == 0) {
-            throw std::invalid_argument("Unable to create a Signature referring to a 0-dimensions array.");
+            throw std::invalid_argument("Unable to create a signature referring to a 0-dimensions array.");
         }
         if (base == VOID) {
-            throw std::invalid_argument("Cannot create an Array of a void array.");
+            throw std::invalid_argument("Cannot create an array of a void array.");
         }
 
-		this->signature += std::string('[', order) + base.string();
+		this->sign += std::string('[', order) + base.string();
     }
 
-	size_t Array::get_order() const noexcept {
+	size_t array::get_order() const noexcept {
 		return this->order;
 	}
 
-    Signature Array::getBaseSignature() const noexcept {
-        return Signature(this->string().substr(this->order));
+    signature array::getBasesignature() const noexcept {
+        return signature(this->string().substr(this->order));
     }
 
-    Method::Method(const std::string& s) {
-        this->signature = s;
+    method::method(const std::string& s) {
+        this->sign = s;
     }
 
-    Method::Method(const Signature& returntype) {
-        this->signature = "()" + returntype.string();
+    method::method(const signature& returntype) {
+        this->sign = "()" + returntype.string();
     }
 
-    Method::Method(const Signature& returntype, const Args& args) {
-        this->signature = "(";
-		this->signature += args.string();
-		this->signature += ')';
-		this->signature += returntype.string();
+    method::method(const signature& returntype, const args& args) {
+        this->sign = "(";
+		this->sign += args.string();
+		this->sign += ')';
+		this->sign += returntype.string();
     }
 
-    Signature Method::returnType() const noexcept {
-        return Signature(this->string().substr(this->string().find_last_of(')')+1));
+    signature method::returnType() const noexcept {
+        return signature(this->string().substr(this->string().find_last_of(')')+1));
     }
 
-    Constructor::Constructor() : Method(VOID) {
+    constructor::constructor() : method(VOID) {
 
     }
 
-    Constructor::Constructor(const std::string& signature) : Method(signature) {
+    constructor::constructor(const std::string& signature) : method(signature) {
         if (signature[signature.length()-1] != 'V') {
-            throw std::invalid_argument("Constructors must not state any return type other than void: \"(...)V\"");
+            throw std::invalid_argument("constructors must not state any return type other than void: \"(...)V\"");
         }
     }
 
-    Constructor::Constructor(const Args& args) : Method(VOID, args) {
+    constructor::constructor(const args& args) : method(VOID, args) {
 
     }
 
-    Field::Field(const std::string& signature) {
+    field::field(const std::string& signature) {
         if (signature.find('(') != std::string::npos || signature.find(')') != std::string::npos) {
-			throw std::invalid_argument("Unable to initialize a Field with a Method.");
+			throw std::invalid_argument("Unable to initialize a field with a method.");
 		}
     }
 
-    Field::Field(const Signature& type) {
-        this->signature = type.string();
+    field::field(const signature& type) {
+        this->sign = type.string();
     }
 }

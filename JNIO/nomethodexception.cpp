@@ -2,11 +2,11 @@
 
 namespace jnio {
 
-    NoSuchMethodException::NoSuchMethodException() : jnio_exception("No such method exists.") {
+    no_such_method::no_such_method() : jnio_exception("No such method exists.") {
 
     }
 
-    NoSuchMethodException::NoSuchMethodException(const char* message) : jnio_exception(message) {
+    no_such_method::no_such_method(const char* message) : jnio_exception(message) {
 		
     }
 }

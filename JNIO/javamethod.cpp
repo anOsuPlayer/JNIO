@@ -2,7 +2,7 @@
 
 namespace jnio {
 
-    JavaMethod::JavaMethod(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Method& sign) {
+    java_method::java_method(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::method& sign) {
         this->env = env;
         this->clazz = &clazz;
         this->name = name;
@@ -10,43 +10,43 @@ namespace jnio {
         this->method = env->GetMethodID(clazz.getJClass(), name.c_str(), sign);
 
         if (this->method == nullptr) {
-            throw NoSuchMethodException();
+            throw no_such_method();
         }
     }
     
-    JavaMethod::operator const jmethodID&() const noexcept {
+    java_method::operator const jmethodID&() const noexcept {
         return this->method;
     }
 
-    const jmethodID& JavaMethod::getJMethod() const noexcept {
+    const jmethodID& java_method::getJMethod() const noexcept {
         return this->method;
     }
 
-    const sign::Method& JavaMethod::getSignature() const noexcept {
+    const sign::method& java_method::getSignature() const noexcept {
         return this->sign;
     }
 
-    JValue JavaMethod::callOn(const JavaObject& obj, std::initializer_list<JValue> args) const {
+    value java_method::callOn(const java_object& obj, std::initializer_list<value> args) const {
         return obj.call(*this, args);
     }
 
-    JValue JavaMethod::callOn(jobject obj, std::initializer_list<JValue> args) const {
-        return JavaObject::_call(this->env, obj, *this, args);
+    value java_method::callOn(jobject obj, std::initializer_list<value> args) const {
+        return java_object::_call(this->env, obj, *this, args);
     }
 
-	const std::string& JavaMethod::string() const noexcept {
+	const std::string& java_method::string() const noexcept {
         return this->name;
     }
 
-    const char* JavaMethod::c_str() const noexcept {
+    const char* java_method::c_str() const noexcept {
         return this->name.c_str();
     }
 
-    bool JavaMethod::operator == (const JavaMethod& other) const noexcept {
+    bool java_method::operator == (const java_method& other) const noexcept {
         return this->name == other.name && this->sign == other.sign && this->clazz == other.clazz;
     }
 
-    JavaStaticMethod::JavaStaticMethod(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Method& sign) {
+    java_static_method::java_static_method(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::method& sign) {
         this->env = env;
         this->clazz = &clazz;
         this->name = name;
@@ -54,32 +54,32 @@ namespace jnio {
         this->method = env->GetStaticMethodID(clazz.getJClass(), name.c_str(), sign);
 
         if (this->method == nullptr) {
-            throw NoSuchMethodException();
+            throw no_such_method();
         }
     }
 
-    JValue JavaStaticMethod::callOn(const JavaObject& obj, std::initializer_list<JValue> args) const {
-        throw jnio_exception("Unable to call JavaStaticMethod on a JavaObject.");
+    value java_static_method::callOn(const java_object& obj, std::initializer_list<value> args) const {
+        throw jnio_exception("Unable to call java_static_method on a java_object.");
     }
 
-    JValue JavaStaticMethod::callOn(jobject obj, std::initializer_list<JValue> args) const {
-        throw jnio_exception("Unable to call JavaStaticMethod on a JavaObject.");
+    value java_static_method::callOn(jobject obj, std::initializer_list<value> args) const {
+        throw jnio_exception("Unable to call java_static_method on a java_object.");
     }
 
-    JValue JavaStaticMethod::call(std::initializer_list<JValue> args) const {
+    value java_static_method::call(std::initializer_list<value> args) const {
         return this->clazz->call(*this, args);
     }
 
-    JavaConstructor::JavaConstructor(JNIEnv* env, const JavaClass& clazz, const sign::Constructor& cs) :
-		JavaMethod(env, "<init>", clazz, cs) {
+    java_constructor::java_constructor(JNIEnv* env, const java_class& clazz, const sign::constructor& cs) :
+		java_method(env, "<init>", clazz, cs) {
     }
 
-    JavaConstructor::JavaConstructor(JNIEnv* env, const JavaClass& clazz)
-		: JavaMethod(env, "<init>", clazz, sign::DEFAULT) {
+    java_constructor::java_constructor(JNIEnv* env, const java_class& clazz)
+		: java_method(env, "<init>", clazz, sign::DEFAULT) {
 	}
 
-    JavaObject JavaConstructor::newInstance(std::initializer_list<JValue> args) const {
-        JavaObject obj(this->env, (args.size() == 0) ? env->NewObject(this->clazz->getJClass(), this->method)
+    java_object java_constructor::newInstance(std::initializer_list<value> args) const {
+        java_object obj(this->env, (args.size() == 0) ? env->NewObject(this->clazz->getJClass(), this->method)
             : env->NewObjectA(this->clazz->getJClass(), this->method, (jvalue*) args.begin()));
         
         if (obj == nullptr) {
@@ -93,8 +93,8 @@ namespace jnio {
         return obj;
     }
 
-    JavaObjectArray JavaConstructor::newArray(size_t length) const {
-        JavaObjectArray arr(this->env, env->NewObjectArray(length, this->clazz->clazz, nullptr));
+    java_object_array java_constructor::newArray(size_t length) const {
+        java_object_array arr(this->env, env->NewObjectArray(length, this->clazz->clazz, nullptr));
 
         if (arr == nullptr) {
             throw jnio_exception("Array creation failed.");

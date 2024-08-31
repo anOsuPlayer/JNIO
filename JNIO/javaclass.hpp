@@ -15,62 +15,62 @@
 
 	namespace jnio {
 
-		class JavaPackage;
-		class JavaMethod;
-		class JavaConstructor;
-		class JavaStaticMethod;
-		class JavaField;
-		class JavaStaticField;
-		class JavaObject;
+		class java_package;
+		class java_method;
+		class java_constructor;
+		class java_static_method;
+		class java_field;
+		class java_static_field;
+		class java_object;
 
-		class JavaClass {
+		class java_class {
 			protected:
 				std::string classname;
 				jclass clazz;
 				JNIEnv* env;
 
 			public:
-				JavaClass() = default;
-				JavaClass(JNIEnv* env, jclass clazz);
-				explicit JavaClass(JNIEnv* env, const std::string& fullname);
-				explicit JavaClass(JNIEnv* env, const JavaPackage& pack, const std::string& classname);
+				java_class() = default;
+				java_class(JNIEnv* env, jclass clazz);
+				explicit java_class(JNIEnv* env, const std::string& fullname);
+				explicit java_class(JNIEnv* env, const java_package& pack, const std::string& classname);
 				
-				virtual ~JavaClass();
+				virtual ~java_class();
 
-				JavaClass(const JavaClass& clazz);
-				virtual JavaClass& operator = (const JavaClass& other);
+				java_class(const java_class& clazz);
+				virtual java_class& operator = (const java_class& other);
 
 				operator const jclass&() const noexcept;
 				jclass getJClass() const noexcept;
 
-				virtual JavaObject asObject() const noexcept final;
+				virtual java_object as_object() const noexcept final;
 
-				JValue call(const JavaStaticMethod& jsm, std::initializer_list<JValue> args = {}) const;
+				value call(const java_static_method& jsm, std::initializer_list<value> args = {}) const;
 
-				JValue access(const JavaStaticField& jsf) const;
-				void edit(const JavaStaticField& jsf, const JValue& value) const;
+				value access(const java_static_field& jsf) const;
+				void edit(const java_static_field& jsf, const value& value) const;
 
-				JavaMethod getMethod(const char* name, const sign::Method& ms) const;
-				JavaStaticMethod getStaticMethod(const char* name, const sign::Method& ms) const;
+				java_method getMethod(const char* name, const sign::method& ms) const;
+				java_static_method getStaticMethod(const char* name, const sign::method& ms) const;
 
-				JavaConstructor getConstructor(const sign::Constructor& cs = sign::DEFAULT) const;
+				java_constructor getConstructor(const sign::constructor& cs = sign::DEFAULT) const;
 
-				JavaField getField(const char* name, const sign::Field& ms);
-				JavaStaticField getStaticField(const char* name, const sign::Field& ms);
+				java_field getField(const char* name, const sign::field& ms);
+				java_static_field getStaticField(const char* name, const sign::field& ms);
 
 				bool isArray() const noexcept;
 
 				bool extends(const jclass& clazz) const noexcept;
 
-				JavaClass arrayType(size_t level = 1) const;
+				java_class arrayType(size_t level = 1) const;
 
-				JavaClass componentType() const noexcept;
-				JavaClass baseType() const noexcept;
+				java_class componentType() const noexcept;
+				java_class baseType() const noexcept;
 
 				const std::string& string() const noexcept;
-				bool operator == (const JavaClass& other) const noexcept;
+				bool operator == (const java_class& other) const noexcept;
 			
-			friend class JavaConstructor;
+			friend class java_constructor;
 		};
 	}
 	

@@ -9,62 +9,62 @@
 
 	namespace jnio {
 
-		class JavaClass;
-		class JavaObject;
+		class java_class;
+		class java_object;
 
-		class JavaField {
+		class java_field {
 			protected:
 				JNIEnv* env;
 				std::string name;
-				const JavaClass* clazz;
-				sign::Field sign;
+				const java_class* clazz;
+				sign::field sign;
 				jfieldID field;
 
 			public:
-				JavaField() = default;
-				explicit JavaField(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Field& sign);
+				java_field() = default;
+				explicit java_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign);
 
-				virtual ~JavaField() = default;
+				virtual ~java_field() = default;
 
-				JavaField(const JavaField& meth) = default;
-				JavaField& operator = (const JavaField& other) = default;
+				java_field(const java_field& meth) = default;
+				java_field& operator = (const java_field& other) = default;
 
 				const jfieldID& getJField() const noexcept;
 				operator const jfieldID&() const noexcept;
 
-				const sign::Field& getSignature() const noexcept;
+				const sign::field& getSignature() const noexcept;
 
-				virtual JValue accessOn(const JavaObject& obj) const;
-				virtual void editOn(JavaObject& obj, const JValue& value);
+				virtual value accessOn(const java_object& obj) const;
+				virtual void editOn(java_object& obj, const value& value);
 
-				virtual JValue accessOn(jobject obj) const;
-				virtual void editOn(jobject obj, const JValue& value);
+				virtual value accessOn(jobject obj) const;
+				virtual void editOn(jobject obj, const value& value);
 
 				const std::string& string() const noexcept;
 				const char* c_str() const noexcept;
-				bool operator == (const JavaField& other) const noexcept;
+				bool operator == (const java_field& other) const noexcept;
 		};
 
-		class JavaStaticField : public JavaField {
+		class java_static_field : public java_field {
 			public:
-				JavaStaticField() = default;
-				explicit JavaStaticField(JNIEnv* env, const std::string& name, const JavaClass& clazz, const sign::Field& sign);
+				java_static_field() = default;
+				explicit java_static_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign);
 				
-				virtual ~JavaStaticField() = default;
-				JavaStaticField& operator = (const JavaStaticField& other) = default;
+				virtual ~java_static_field() = default;
+				java_static_field& operator = (const java_static_field& other) = default;
 
-				JavaStaticField(const JavaStaticField& meth);
+				java_static_field(const java_static_field& meth);
 
-				virtual JValue accessOn(const JavaObject& obj) const override final;
-				virtual void editOn(JavaObject& obj, const JValue& value) override final;
+				virtual value accessOn(const java_object& obj) const override final;
+				virtual void editOn(java_object& obj, const value& value) override final;
 
-				virtual JValue accessOn(jobject obj) const override final;
-				virtual void editOn(jobject obj, const JValue& value) override final;
+				virtual value accessOn(jobject obj) const override final;
+				virtual void editOn(jobject obj, const value& value) override final;
 
-				JValue access() const;
-				void edit(const JValue& value) const;
+				value access() const;
+				void edit(const value& value) const;
 
-				bool operator == (const JavaStaticField& other) const noexcept;
+				bool operator == (const java_static_field& other) const noexcept;
 		};
 	}
 

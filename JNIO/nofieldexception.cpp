@@ -2,11 +2,11 @@
 
 namespace jnio {
 
-    NoSuchFieldException::NoSuchFieldException() : jnio_exception("No such field exists.") {
+    no_such_field::no_such_field() : jnio_exception("No such field exists.") {
 
     }
 
-    NoSuchFieldException::NoSuchFieldException(const char* message) : jnio_exception(message) {
+    no_such_field::no_such_field(const char* message) : jnio_exception(message) {
 		
     }
 }

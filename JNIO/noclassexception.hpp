@@ -4,9 +4,9 @@
 
 namespace jnio {
 
-    class NoSuchClassException : public jnio_exception {
+    class no_such_class : public jnio_exception {
         public:
-            NoSuchClassException();
-            explicit NoSuchClassException(const char* message);
+            no_such_class();
+            explicit no_such_class(const char* message);
     };
 }

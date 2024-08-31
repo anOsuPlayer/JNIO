@@ -9,42 +9,42 @@
 
 	namespace jnio {
 
-		class JavaMethod;
-		class JavaStaticMethod;
-		class JavaField;
+		class java_method;
+		class java_static_method;
+		class java_field;
 
-		class JavaObject {
+		class java_object {
 			protected:
 				JNIEnv* env;
 				jobject obj;
 
-				JavaObject() = default;
+				java_object() = default;
 
-				static JValue _call(JNIEnv* env, jobject obj, const JavaMethod& jm, std::initializer_list<JValue> args = {});
+				static value _call(JNIEnv* env, jobject obj, const java_method& jm, std::initializer_list<value> args = {});
 
-				static JValue _access(JNIEnv* env, jobject obj, const JavaField& jf);
-				static void _edit(JNIEnv* env, jobject obj, const JavaField& jf, const JValue& value);
+				static value _access(JNIEnv* env, jobject obj, const java_field& jf);
+				static void _edit(JNIEnv* env, jobject obj, const java_field& jf, const value& value);
 
 
 
 			public:
-				JavaObject(JNIEnv* env, const jobject& obj);
+				java_object(JNIEnv* env, const jobject& obj);
 				
-				virtual ~JavaObject();
+				virtual ~java_object();
 
-				JavaObject(const JavaObject& obj);
-				JavaObject& operator = (const JavaObject& obj);
-				JavaObject& operator = (const jobject& obj);
+				java_object(const java_object& obj);
+				java_object& operator = (const java_object& obj);
+				java_object& operator = (const jobject& obj);
 
 				operator const jobject&() const noexcept;
 				jobject getJObject() const noexcept;
 
-				JValue call(const JavaMethod& jm, std::initializer_list<JValue> args = {}) const;
+				value call(const java_method& jm, std::initializer_list<value> args = {}) const;
 
-				JValue access(const JavaField& jf) const;
-				void edit(const JavaField& jf, const JValue& value);
+				value access(const java_field& jf) const;
+				void edit(const java_field& jf, const value& value);
 
-				JavaClass getClass() const;
+				java_class getClass() const;
 				
 				bool sameType(const jobject& obj) const noexcept;
 				bool isInstanceof(const jclass& clazz) const noexcept;
@@ -53,56 +53,56 @@
 				const char* c_str() const noexcept;
 				bool operator == (const jobject& obj) const noexcept;
 
-			friend class JavaMethod;
-			friend class JavaField;
+			friend class java_method;
+			friend class java_field;
 		};
 
-		class JavaObjectArray;
+		class java_object_array;
 
-		class JavaObjectArrayElement : public JavaObject {
+		class java_object_arrayElement : public java_object {
 			private:
-				JavaObjectArray* ref;
+				java_object_array* ref;
 				size_t refIndex;
 
 				bool hasChanged = false;
 
-				JavaObjectArrayElement() = default;
+				java_object_arrayElement() = default;
 
-				JavaObjectArrayElement(JavaObjectArray* ref, size_t index);
+				java_object_arrayElement(java_object_array* ref, size_t index);
 
 			public:
-				JavaObjectArrayElement(const jobject& obj) = delete;
-				JavaObjectArrayElement(const JavaObject& obj) = delete;
-				virtual ~JavaObjectArrayElement();
+				java_object_arrayElement(const jobject& obj) = delete;
+				java_object_arrayElement(const java_object& obj) = delete;
+				virtual ~java_object_arrayElement();
 
-				JavaObjectArrayElement& operator = (const JavaObject& obj);
-				JavaObjectArrayElement& operator = (const jobject& obj);
+				java_object_arrayElement& operator = (const java_object& obj);
+				java_object_arrayElement& operator = (const jobject& obj);
 			
-			friend class JavaObjectArray;
+			friend class java_object_array;
 		};
 
-		class JavaObjectArray {
+		class java_object_array {
 			protected:
 				JNIEnv* env;
 				jobjectArray arr;
-				JavaObjectArrayElement* currentElement;
+				java_object_arrayElement* currentElement;
 
 			public:
-				JavaObjectArray() = default;
-				JavaObjectArray(JNIEnv* env, const jobjectArray& arr);
+				java_object_array() = default;
+				java_object_array(JNIEnv* env, const jobjectArray& arr);
 
-				virtual ~JavaObjectArray();
+				virtual ~java_object_array();
 
-				JavaObjectArray(const JavaObjectArray& arr);
-				JavaObjectArray& operator = (const JavaObjectArray& arr);
-				JavaObjectArray& operator = (const jobjectArray& arr);
+				java_object_array(const java_object_array& arr);
+				java_object_array& operator = (const java_object_array& arr);
+				java_object_array& operator = (const jobjectArray& arr);
 
 				operator const jobjectArray&() const noexcept;
 				jobjectArray getJObjectArray() const noexcept;
 
-				JavaObject asObject() const noexcept;
+				java_object as_object() const noexcept;
 
-				JavaObjectArrayElement& operator [] (size_t index);
+				java_object_arrayElement& operator [] (size_t index);
 
 				size_t length() const noexcept;
 
@@ -110,7 +110,7 @@
 				const char* c_str() const noexcept;
 				bool operator == (const jobjectArray& arr) const noexcept;
 			
-			friend class JavaObjectArrayElement;
+			friend class java_object_arrayElement;
 			friend class Moona;
 		};
 	}

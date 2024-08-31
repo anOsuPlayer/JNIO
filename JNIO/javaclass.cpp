@@ -7,7 +7,7 @@ namespace jnio {
 
 	static jmethodID GET_NAME;
 
-    JavaClass::JavaClass(JNIEnv* env, jclass clazz) {
+    java_class::java_class(JNIEnv* env, jclass clazz) {
 		this->env = env;
         this->clazz = (jclass) env->NewWeakGlobalRef(clazz);
 
@@ -31,7 +31,7 @@ namespace jnio {
         env->DeleteLocalRef(thisClass);
     }
 
-    JavaClass::JavaClass(JNIEnv* env, const std::string& classname) {
+    java_class::java_class(JNIEnv* env, const std::string& classname) {
 		this->env = env;
 		this->classname = classname;
 		for (size_t i = 0; i < this->classname.size(); i++) {
@@ -41,13 +41,13 @@ namespace jnio {
         jclass c = env->FindClass(this->classname.c_str());
 
         if (c == nullptr) {
-            throw NoSuchClassException();
+            throw no_such_class();
         }
         this->clazz = (jclass) env->NewWeakGlobalRef(c);
         env->DeleteLocalRef(c);
     }
 	
-    JavaClass::JavaClass(JNIEnv* env, const JavaPackage& pack, const std::string& classname) {
+    java_class::java_class(JNIEnv* env, const java_package& pack, const std::string& classname) {
 		this->env;
 
         this->classname = pack.string();
@@ -60,26 +60,26 @@ namespace jnio {
         jclass c = env->FindClass(this->classname.c_str());
 
         if (c == nullptr) {
-            throw NoSuchClassException();
+            throw no_such_class();
         }
         this->clazz = (jclass) env->NewWeakGlobalRef(c);
 
         env->DeleteLocalRef(c);
     }
 
-    JavaClass::JavaClass(const JavaClass& clazz) {
+    java_class::java_class(const java_class& clazz) {
 		this->env = clazz.env;
         this->classname = clazz.classname;
         this->clazz = (jclass) env->NewWeakGlobalRef(clazz.clazz);
     }
 
-    JavaClass::~JavaClass() {
+    java_class::~java_class() {
         if (this->clazz != nullptr) {
             env->DeleteWeakGlobalRef(this->clazz);
         }
     }
 
-    JavaClass& JavaClass::operator = (const JavaClass& other) {
+    java_class& java_class::operator = (const java_class& other) {
         this->classname = other.classname;
 
         if (this->clazz != nullptr) {
@@ -90,8 +90,8 @@ namespace jnio {
         return *this;
     }
 
-    JValue JavaClass::call(const JavaStaticMethod& jsm, std::initializer_list<JValue> args) const {
-        JValue r;
+    value java_class::call(const java_static_method& jsm, std::initializer_list<value> args) const {
+        value r;
 
         switch (jsm.getSignature().returnType().string()[0]) {
             case 'Z' : {
@@ -193,9 +193,9 @@ namespace jnio {
         return r;
     }
 
-    JValue JavaClass::access(const JavaStaticField& jsf) const {
+    value java_class::access(const java_static_field& jsf) const {
         const char id = jsf.getSignature()[0];
-        JValue r;
+        value r;
 
         switch (id) {
             case 'Z' : {
@@ -243,7 +243,7 @@ namespace jnio {
         return r;
     }
 
-    void JavaClass::edit(const JavaStaticField& jsf, const JValue& value) const {
+    void java_class::edit(const java_static_field& jsf, const value& value) const {
         const char id = jsf.getSignature()[0];
 
         switch (id) {
@@ -291,66 +291,66 @@ namespace jnio {
         }
     }
 
-    JavaClass::operator const jclass&() const noexcept {
+    java_class::operator const jclass&() const noexcept {
         return this->clazz;
     }
 
-    jclass JavaClass::getJClass() const noexcept {
+    jclass java_class::getJClass() const noexcept {
         return (jclass) env->NewLocalRef(this->clazz);
     }
 
-    JavaObject JavaClass::asObject() const noexcept {
-        return JavaObject(this->env, this->clazz);
+    java_object java_class::as_object() const noexcept {
+        return java_object(this->env, this->clazz);
     }
 
-    JavaMethod JavaClass::getMethod(const char* name, const sign::Method& ms) const {
+    java_method java_class::getMethod(const char* name, const sign::method& ms) const {
         if (name == nullptr) {
-            throw std::invalid_argument("Unable to find any JavaMethod from a nullptr.");
+            throw std::invalid_argument("Unable to find any java_method from a nullptr.");
         }
-        return JavaMethod(this->env, name, *this, ms);
+        return java_method(this->env, name, *this, ms);
     }
 
-    JavaStaticMethod JavaClass::getStaticMethod(const char* name, const sign::Method& ms) const {
+    java_static_method java_class::getStaticMethod(const char* name, const sign::method& ms) const {
         if (name == nullptr) {
-            throw std::invalid_argument("Unable to find any JavaStaticMethod from a nullptr.");
+            throw std::invalid_argument("Unable to find any java_static_method from a nullptr.");
         }
-        return JavaStaticMethod(this->env, name, *this, ms);
+        return java_static_method(this->env, name, *this, ms);
     }
 
-    JavaConstructor JavaClass::getConstructor(const sign::Constructor& cs) const {
-        return JavaConstructor(this->env, *this, cs);
+    java_constructor java_class::getConstructor(const sign::constructor& cs) const {
+        return java_constructor(this->env, *this, cs);
     }
 
-    JavaField JavaClass::getField(const char* name, const sign::Field& fs) {
+    java_field java_class::getField(const char* name, const sign::field& fs) {
         if (name == nullptr) {
-            throw std::invalid_argument("Unable to find any JavaField from a nullptr.");
+            throw std::invalid_argument("Unable to find any java_field from a nullptr.");
         }
-        return JavaField(this->env, name, *this, fs);
+        return java_field(this->env, name, *this, fs);
     }
 
-    JavaStaticField JavaClass::getStaticField(const char* name, const sign::Field& fs) {
+    java_static_field java_class::getStaticField(const char* name, const sign::field& fs) {
         if (name == nullptr) {
-            throw std::invalid_argument("Unable to find any JavaStaticField from a nullptr.");
+            throw std::invalid_argument("Unable to find any java_static_field from a nullptr.");
         }
-        return JavaStaticField(this->env, name, *this, fs);
+        return java_static_field(this->env, name, *this, fs);
     }
 
-    bool JavaClass::isArray() const noexcept {
+    bool java_class::isArray() const noexcept {
         return this->classname[0] == '[';
     }
 
-    bool JavaClass::extends(const jclass& clazz) const noexcept {
+    bool java_class::extends(const jclass& clazz) const noexcept {
         return env->IsAssignableFrom(this->clazz, clazz);
     }
 
-    JavaClass JavaClass::arrayType(size_t level) const {
+    java_class java_class::arrayType(size_t level) const {
         if (level == 0) {
             throw std::invalid_argument("Unable to obtain 0-dimensional arrays.");
         }
 
 		if (this->isArray()) {
 			std::string name = '[' + this->classname;
-			return JavaClass(this->env, name);
+			return java_class(this->env, name);
 		}
 
 		std::string name('[', level);
@@ -358,36 +358,36 @@ namespace jnio {
 		name += this->classname;
 		name += ';';
 
-        return JavaClass(this->env, name);
+        return java_class(this->env, name);
     }
 
-    JavaClass JavaClass::componentType() const noexcept {
+    java_class java_class::componentType() const noexcept {
         if (this->classname[0] == '[') {
 			if (this->classname[1] == '[') {
-				return JavaClass(this->env, this->classname.substr(1));
+				return java_class(this->env, this->classname.substr(1));
 			}
 
 			std::string name = this->classname.substr(2);
-			return JavaClass(this->env, this->classname.substr(0, this->classname.size()-1));
+			return java_class(this->env, this->classname.substr(0, this->classname.size()-1));
         }
 
 		return *this;
     }
 
-	JavaClass JavaClass::baseType() const noexcept {
+	java_class java_class::baseType() const noexcept {
         if (this->classname[0] == '[') {
 			std::string name = this->classname.substr(this->classname.find_first_of('L')+1);
-			return JavaClass(this->env, this->classname.substr(0, this->classname.size()-1));
+			return java_class(this->env, this->classname.substr(0, this->classname.size()-1));
         }
 
 		return *this;
     }
 
-    const std::string& JavaClass::string() const noexcept {
+    const std::string& java_class::string() const noexcept {
         return this->classname;
     }
 
-    bool JavaClass::operator == (const JavaClass& other) const noexcept {
+    bool java_class::operator == (const java_class& other) const noexcept {
         return this->classname == other.classname;
     }
 }

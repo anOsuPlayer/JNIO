@@ -4,9 +4,9 @@
 
 namespace jnio {
 
-    class NoSuchMethodException : public jnio_exception {
+    class no_such_method : public jnio_exception {
         public:
-            NoSuchMethodException();
-            explicit NoSuchMethodException(const char* message);
+            no_such_method();
+            explicit no_such_method(const char* message);
     };
 }
