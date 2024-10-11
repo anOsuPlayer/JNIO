@@ -16,7 +16,7 @@
         static jboolean FALSE(JNI_FALSE);
 
         constexpr jboolean operator ""_jz (unsigned long long l) {
-            return l == 0 ? 1 : 0;
+            return l == 0 ? 0 : 1;
         }
 
         constexpr jbyte operator ""_jb (unsigned long long l) {
