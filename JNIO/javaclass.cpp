@@ -12,7 +12,7 @@ namespace jnio {
         this->clazz = (jclass) env->NewWeakGlobalRef(clazz);
 
         if (GET_CLASS == nullptr) {
-			GET_CLASS = env->GetMethodID(clazz, "getClass", "()Ljava/lang/Class;");
+			GET_CLASS = env->GetMethodID(clazz, "get_class", "()Ljava/lang/Class;");
 		}
 
 		jclass thisClass = (jclass) env->CallObjectMethod(clazz, GET_CLASS);
@@ -93,7 +93,7 @@ namespace jnio {
     value java_class::call(const java_static_method& jsm, std::initializer_list<value> args) const {
         value r;
 
-        switch (jsm.getSignature().returnType().string()[0]) {
+        switch (jsm.get_signature().return_type().string()[0]) {
             case 'Z' : {
                 if (args.size() != 0) {
                     r = env->CallStaticBooleanMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
@@ -194,44 +194,44 @@ namespace jnio {
     }
 
     value java_class::access(const java_static_field& jsf) const {
-        const char id = jsf.getSignature()[0];
+        const char id = jsf.get_signature()[0];
         value r;
 
         switch (id) {
             case 'Z' : {
-                r = env->GetStaticBooleanField(this->clazz, jsf.getJField());
+                r = env->GetStaticBooleanField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'B' : {
-                r = env->GetStaticByteField(this->clazz, jsf.getJField());
+                r = env->GetStaticByteField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'S' : {
-                r = env->GetStaticShortField(this->clazz, jsf.getJField());
+                r = env->GetStaticShortField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'C' : {
-                r = env->GetStaticCharField(this->clazz, jsf.getJField());
+                r = env->GetStaticCharField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'I' : {
-                r = env->GetStaticIntField(this->clazz, jsf.getJField());
+                r = env->GetStaticIntField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'J' : {
-                r = env->GetStaticLongField(this->clazz, jsf.getJField());
+                r = env->GetStaticLongField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'F' : {
-                r = env->GetStaticFloatField(this->clazz, jsf.getJField());
+                r = env->GetStaticFloatField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'D' : {
-                r = env->GetStaticDoubleField(this->clazz, jsf.getJField());
+                r = env->GetStaticDoubleField(this->clazz, jsf.get_jfield());
                 break;
             }
             default : {
-                r = env->GetStaticObjectField(this->clazz, jsf.getJField());
+                r = env->GetStaticObjectField(this->clazz, jsf.get_jfield());
                 break;
             }
         }
@@ -244,43 +244,43 @@ namespace jnio {
     }
 
     void java_class::edit(const java_static_field& jsf, const value& value) const {
-        const char id = jsf.getSignature()[0];
+        const char id = jsf.get_signature()[0];
 
         switch (id) {
             case 'Z' : {
-                env->SetStaticBooleanField(this->clazz, jsf.getJField(), value);
+                env->SetStaticBooleanField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'B' : {
-                env->SetStaticByteField(this->clazz, jsf.getJField(), value);
+                env->SetStaticByteField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'S' : {
-                env->SetStaticShortField(this->clazz, jsf.getJField(), value);
+                env->SetStaticShortField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'C' : {
-                env->SetStaticCharField(this->clazz, jsf.getJField(), value);
+                env->SetStaticCharField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'I' : {
-                env->SetStaticIntField(this->clazz, jsf.getJField(), value);
+                env->SetStaticIntField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'J' : {
-                env->SetStaticLongField(this->clazz, jsf.getJField(), value);
+                env->SetStaticLongField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'F' : {
-                env->SetStaticFloatField(this->clazz, jsf.getJField(), value);
+                env->SetStaticFloatField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'D' : {
-                env->SetStaticDoubleField(this->clazz, jsf.getJField(), value);
+                env->SetStaticDoubleField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             default : {
-                env->SetStaticObjectField(this->clazz, jsf.getJField(), value);
+                env->SetStaticObjectField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
         }

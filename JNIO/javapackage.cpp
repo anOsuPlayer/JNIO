@@ -7,7 +7,7 @@ namespace jnio {
 		this->location = location;
     }
     
-    java_class java_package::getClass(const char* classname) const {
+    java_class java_package::get_class(const char* classname) const {
         if (classname == nullptr) {
             throw std::invalid_argument("Unable to find a Java Class from a nullptr.");
         }

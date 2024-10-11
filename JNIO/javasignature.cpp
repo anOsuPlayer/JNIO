@@ -88,7 +88,7 @@ namespace jnio::sign {
 		this->sign += returntype.string();
     }
 
-    signature method::returnType() const noexcept {
+    signature method::return_type() const noexcept {
         return signature(this->string().substr(this->string().find_last_of(')')+1));
     }
 

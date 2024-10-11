@@ -11,25 +11,41 @@
 
     	#define static_args JNIEnv* env, jclass clazz
 
-        static jboolean TRUE = jboolean(JNI_TRUE);
+        static jboolean TRUE(JNI_TRUE);
 
-        static jboolean FALSE = jboolean(JNI_FALSE);
+        static jboolean FALSE(JNI_FALSE);
 
-        jboolean operator ""_jz (unsigned long long);
+        constexpr jboolean operator ""_jz (unsigned long long l) {
+            return l == 0 ? 1 : 0;
+        }
 
-        jbyte operator ""_jb (unsigned long long);
+        constexpr jbyte operator ""_jb (unsigned long long l) {
+            return static_cast<jbyte>(l);
+        }
         
-        jchar operator ""_jc (unsigned long long);
+        constexpr jchar operator ""_jc (unsigned long long l) {
+            return static_cast<jchar>(l);
+        }
         
-        jshort operator ""_js (unsigned long long);
+        constexpr jshort operator ""_js (unsigned long long l) {
+            return static_cast<jshort>(l);
+        }
         
-        jint operator ""_ji (unsigned long long);
+        constexpr jint operator ""_ji (unsigned long long l) {
+            return static_cast<jint>(l);
+        }
+
+        constexpr jlong operator ""_jl (unsigned long long l) {
+            return static_cast<jlong>(l);
+        }
         
-        jlong operator ""_jl (unsigned long long);
+        constexpr jfloat operator ""_jf (long double ld) {
+            return static_cast<jfloat>(ld);
+        }
         
-        jfloat operator ""_jf (long double);
-        
-        jdouble operator ""_jd (long double);
+        constexpr jdouble operator ""_jd (long double ld) {
+            return static_cast<jdouble>(ld);
+        }
     }
 
 #endif

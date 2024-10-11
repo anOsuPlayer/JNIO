@@ -25,7 +25,7 @@
 				java_package& operator = (const java_package& other) = default;
 				
 
-				java_class getClass(const char* classname) const;
+				java_class get_class(const char* classname) const;
 
 				const std::string& string() const noexcept;
 				const char* c_str() const noexcept;

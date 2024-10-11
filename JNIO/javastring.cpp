@@ -53,7 +53,7 @@ namespace jnio {
         return java_object(this->env, *this);
     }
 
-    java_char_array java_string::toCharArray() const noexcept {
+    java_char_array java_string::to_char_array() const noexcept {
         return java_char_array(this->env, this->length(), std::wstring(this->text.begin(), this->text.end()).c_str());
     }
 

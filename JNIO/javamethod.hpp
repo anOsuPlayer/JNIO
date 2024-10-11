@@ -36,7 +36,7 @@
 				const jmethodID& getJMethod() const noexcept;        
 				operator const jmethodID&() const noexcept;
 
-				const sign::method& getSignature() const noexcept;
+				const sign::method& get_signature() const noexcept;
 
 				virtual value callOn(const java_object& obj, std::initializer_list<value> args = {}) const;
 				virtual value callOn(jobject obj, std::initializer_list<value> args = {}) const;

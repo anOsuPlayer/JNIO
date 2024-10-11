@@ -22,7 +22,7 @@ namespace jnio {
         return this->method;
     }
 
-    const sign::method& java_method::getSignature() const noexcept {
+    const sign::method& java_method::get_signature() const noexcept {
         return this->sign;
     }
 

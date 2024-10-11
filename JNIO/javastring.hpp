@@ -32,7 +32,7 @@
 				java_object as_object() const noexcept;
 
 				operator jstring() const noexcept;
-				java_char_array toCharArray() const noexcept;
+				java_char_array to_char_array() const noexcept;
 
 				const std::string& string() const noexcept;
 				const char* c_str() const noexcept;

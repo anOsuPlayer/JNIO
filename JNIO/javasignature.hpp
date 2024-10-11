@@ -122,7 +122,7 @@
 				method(const method& os) = default;
 				method& operator = (const method& os) = default; 
 
-				signature returnType() const noexcept;
+				signature return_type() const noexcept;
 			
 			friend class constructor;
 		};

@@ -26,19 +26,19 @@
 
 				virtual ~java_field() = default;
 
-				java_field(const java_field& meth) = default;
+				java_field(const java_field& field) = default;
 				java_field& operator = (const java_field& other) = default;
 
-				const jfieldID& getJField() const noexcept;
+				const jfieldID& get_jfield() const noexcept;
 				operator const jfieldID&() const noexcept;
 
-				const sign::field& getSignature() const noexcept;
+				const sign::field& get_signature() const noexcept;
 
-				virtual value accessOn(const java_object& obj) const;
-				virtual void editOn(java_object& obj, const value& value);
+				virtual value access_on(const java_object& obj) const;
+				virtual void edit_on(java_object& obj, const value& value);
 
-				virtual value accessOn(jobject obj) const;
-				virtual void editOn(jobject obj, const value& value);
+				virtual value access_on(jobject obj) const;
+				virtual void edit_on(jobject obj, const value& value);
 
 				const std::string& string() const noexcept;
 				const char* c_str() const noexcept;
@@ -55,11 +55,11 @@
 
 				java_static_field(const java_static_field& meth);
 
-				virtual value accessOn(const java_object& obj) const override final;
-				virtual void editOn(java_object& obj, const value& value) override final;
+				virtual value access_on(const java_object& obj) const override final;
+				virtual void edit_on(java_object& obj, const value& value) override final;
 
-				virtual value accessOn(jobject obj) const override final;
-				virtual void editOn(jobject obj, const value& value) override final;
+				virtual value access_on(jobject obj) const override final;
+				virtual void edit_on(jobject obj, const value& value) override final;
 
 				value access() const;
 				void edit(const value& value) const;

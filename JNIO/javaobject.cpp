@@ -38,7 +38,7 @@ namespace jnio {
     }
 
     value java_object::_call(JNIEnv* env, jobject obj, const java_method& jm, std::initializer_list<value> args) {
-        sign::signature ret = jm.getSignature().returnType();
+        sign::signature ret = jm.get_signature().return_type();
         value r;
 
         switch (ret[0]) {
@@ -146,44 +146,44 @@ namespace jnio {
     }
 
     value java_object::_access(JNIEnv* env, jobject obj, const java_field& jf) {
-        const char id = jf.getSignature()[0];
+        const char id = jf.get_signature()[0];
         value r;
 
         switch (id) {
             case 'Z' : {
-                r = env->GetBooleanField(obj, jf.getJField());
+                r = env->GetBooleanField(obj, jf.get_jfield());
                 break;
             }
             case 'B' : {
-                r = env->GetByteField(obj, jf.getJField());
+                r = env->GetByteField(obj, jf.get_jfield());
                 break;
             }
             case 'S' : {
-                r = env->GetShortField(obj, jf.getJField());
+                r = env->GetShortField(obj, jf.get_jfield());
                 break;
             }
             case 'C' : {
-                r = env->GetCharField(obj, jf.getJField());
+                r = env->GetCharField(obj, jf.get_jfield());
                 break;
             }
             case 'I' : {
-                r = env->GetIntField(obj, jf.getJField());
+                r = env->GetIntField(obj, jf.get_jfield());
                 break;
             }
             case 'J' : {
-                r = env->GetLongField(obj, jf.getJField());
+                r = env->GetLongField(obj, jf.get_jfield());
                 break;
             }
             case 'F' : {
-                r = env->GetFloatField(obj, jf.getJField());
+                r = env->GetFloatField(obj, jf.get_jfield());
                 break;
             }
             case 'D' : {
-                r = env->GetDoubleField(obj, jf.getJField());
+                r = env->GetDoubleField(obj, jf.get_jfield());
                 break;
             }
             default : {
-                r = env->GetObjectField(obj, jf.getJField());
+                r = env->GetObjectField(obj, jf.get_jfield());
                 break;
             }
         }
@@ -200,43 +200,43 @@ namespace jnio {
     }
 
     void java_object::_edit(JNIEnv* env, jobject obj, const java_field& jf, const value& value) {
-        const char id = jf.getSignature()[0];
+        const char id = jf.get_signature()[0];
 
         switch (id) {
             case 'Z' : {
-                env->SetBooleanField(obj, jf.getJField(), value);
+                env->SetBooleanField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'B' : {
-                env->SetByteField(obj, jf.getJField(), value);
+                env->SetByteField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'S' : {
-                env->SetShortField(obj, jf.getJField(), value);
+                env->SetShortField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'C' : {
-                env->SetCharField(obj, jf.getJField(), value);
+                env->SetCharField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'I' : {
-                env->SetIntField(obj, jf.getJField(), value);
+                env->SetIntField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'J' : {
-                env->SetLongField(obj, jf.getJField(), value);
+                env->SetLongField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'F' : {
-                env->SetFloatField(obj, jf.getJField(), value);
+                env->SetFloatField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'D' : {
-                env->SetDoubleField(obj, jf.getJField(), value);
+                env->SetDoubleField(obj, jf.get_jfield(), value);
                 break;
             }
             default : {
-                env->SetObjectField(obj, jf.getJField(), value);
+                env->SetObjectField(obj, jf.get_jfield(), value);
                 break;
             }
         }
@@ -251,9 +251,9 @@ namespace jnio {
         return java_object::_edit(this->env, this->obj, jf, value);
     }
 
-    java_class java_object::getClass() const {
-        if (this->getJObject() == nullptr) {
-            throw std::invalid_argument("Unable to call .getClass() method on a null java_object.");
+    java_class java_object::get_class() const {
+        if (this->get_jobject() == nullptr) {
+            throw std::invalid_argument("Unable to call .get_class() method on a null java_object.");
         }
 
         return java_class(this->env, env->GetObjectClass(this->obj));
@@ -263,7 +263,7 @@ namespace jnio {
         return this->obj;
     }
 
-    jobject java_object::getJObject() const noexcept {
+    jobject java_object::get_jobject() const noexcept {
         return env->NewLocalRef(this->obj);
     }
 
@@ -303,27 +303,27 @@ namespace jnio {
         return eq;
     }
 	
-    bool java_object::sameType(const jobject& obj) const noexcept {
+    bool java_object::same_type(const jobject& obj) const noexcept {
         return (env->IsInstanceOf(this->obj, env->GetObjectClass(obj)) == 0 ? false : true);
     }
 
-    bool java_object::isInstanceof(const jclass& clazz) const noexcept {
+    bool java_object::is_instanceof(const jclass& clazz) const noexcept {
         return (env->IsInstanceOf(this->obj, clazz) == 0 ? false : true);
     }
 
-    java_object_arrayElement::java_object_arrayElement(java_object_array* ref, size_t refIndex)
+    java_object_array_element::java_object_array_element(java_object_array* ref, size_t refIndex)
 		: java_object(ref->env, env->GetObjectArrayElement(ref->arr, refIndex)) {
         this->ref = ref;
 		this->refIndex = refIndex;
     }
 
-    java_object_arrayElement::~java_object_arrayElement() {
+    java_object_array_element::~java_object_array_element() {
         if (this->hasChanged) {
             env->SetObjectArrayElement(this->ref->arr, this->refIndex, this->obj);
         }
     }
 
-	java_object_arrayElement& java_object_arrayElement::operator = (const java_object& obj) {
+	java_object_array_element& java_object_array_element::operator = (const java_object& obj) {
         this->hasChanged = true;
         if (this->obj != nullptr) {
             env->DeleteWeakGlobalRef(this->obj);
@@ -333,7 +333,7 @@ namespace jnio {
         return *this;
     }
 
-    java_object_arrayElement& java_object_arrayElement::operator = (const jobject& obj) {
+    java_object_array_element& java_object_array_element::operator = (const jobject& obj) {
         this->hasChanged = true;
         if (this->obj != nullptr) {
             env->DeleteWeakGlobalRef(this->obj);
@@ -394,7 +394,7 @@ namespace jnio {
         return java_object(this->env, this->arr);
     }
 
-    java_object_arrayElement& java_object_array::operator [] (size_t index) {
+    java_object_array_element& java_object_array::operator [] (size_t index) {
         if (index >= this->length()) {
             throw std::out_of_range("The given index goes out of bounds for this java_object_array.");
         }
@@ -402,7 +402,7 @@ namespace jnio {
         if (this->currentElement != nullptr) {
             delete this->currentElement;
         }
-        this->currentElement = new java_object_arrayElement(this, index);
+        this->currentElement = new java_object_array_element(this, index);
         
         return *this->currentElement;
     }

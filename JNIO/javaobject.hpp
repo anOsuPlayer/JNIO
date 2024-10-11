@@ -25,8 +25,6 @@
 				static value _access(JNIEnv* env, jobject obj, const java_field& jf);
 				static void _edit(JNIEnv* env, jobject obj, const java_field& jf, const value& value);
 
-
-
 			public:
 				java_object(JNIEnv* env, const jobject& obj);
 				
@@ -37,17 +35,17 @@
 				java_object& operator = (const jobject& obj);
 
 				operator const jobject&() const noexcept;
-				jobject getJObject() const noexcept;
+				jobject get_jobject() const noexcept;
 
 				value call(const java_method& jm, std::initializer_list<value> args = {}) const;
 
 				value access(const java_field& jf) const;
 				void edit(const java_field& jf, const value& value);
 
-				java_class getClass() const;
+				java_class get_class() const;
 				
-				bool sameType(const jobject& obj) const noexcept;
-				bool isInstanceof(const jclass& clazz) const noexcept;
+				bool same_type(const jobject& obj) const noexcept;
+				bool is_instanceof(const jclass& clazz) const noexcept;
 
 				std::string string() const noexcept;
 				const char* c_str() const noexcept;
@@ -59,24 +57,24 @@
 
 		class java_object_array;
 
-		class java_object_arrayElement : public java_object {
+		class java_object_array_element : public java_object {
 			private:
 				java_object_array* ref;
 				size_t refIndex;
 
 				bool hasChanged = false;
 
-				java_object_arrayElement() = default;
+				java_object_array_element() = default;
 
-				java_object_arrayElement(java_object_array* ref, size_t index);
+				java_object_array_element(java_object_array* ref, size_t index);
 
 			public:
-				java_object_arrayElement(const jobject& obj) = delete;
-				java_object_arrayElement(const java_object& obj) = delete;
-				virtual ~java_object_arrayElement();
+				java_object_array_element(const jobject& obj) = delete;
+				java_object_array_element(const java_object& obj) = delete;
+				virtual ~java_object_array_element();
 
-				java_object_arrayElement& operator = (const java_object& obj);
-				java_object_arrayElement& operator = (const jobject& obj);
+				java_object_array_element& operator = (const java_object& obj);
+				java_object_array_element& operator = (const jobject& obj);
 			
 			friend class java_object_array;
 		};
@@ -85,7 +83,7 @@
 			protected:
 				JNIEnv* env;
 				jobjectArray arr;
-				java_object_arrayElement* currentElement;
+				java_object_array_element* currentElement;
 
 			public:
 				java_object_array() = default;
@@ -102,7 +100,7 @@
 
 				java_object as_object() const noexcept;
 
-				java_object_arrayElement& operator [] (size_t index);
+				java_object_array_element& operator [] (size_t index);
 
 				size_t length() const noexcept;
 
@@ -110,7 +108,7 @@
 				const char* c_str() const noexcept;
 				bool operator == (const jobjectArray& arr) const noexcept;
 			
-			friend class java_object_arrayElement;
+			friend class java_object_array_element;
 			friend class Moona;
 		};
 	}

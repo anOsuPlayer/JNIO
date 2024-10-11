@@ -18,27 +18,27 @@ namespace jnio {
         return this->field;
     }
 
-    const jfieldID& java_field::getJField() const noexcept {
+    const jfieldID& java_field::get_jfield() const noexcept {
         return this->field;
     }
 
-    const sign::field& java_field::getSignature() const noexcept {
+    const sign::field& java_field::get_signature() const noexcept {
         return this->sign;
     }
 
-    value java_field::accessOn(const java_object& obj) const {
+    value java_field::access_on(const java_object& obj) const {
         return obj.access(*this);
     }
 
-    void java_field::editOn(java_object& obj, const value& value) {
+    void java_field::edit_on(java_object& obj, const value& value) {
         obj.edit(*this, value);
     }
 
-    value java_field::accessOn(jobject obj) const {
+    value java_field::access_on(jobject obj) const {
         return java_object::_access(this->env, obj, *this);
     }
 
-    void java_field::editOn(jobject obj, const value& value) {
+    void java_field::edit_on(jobject obj, const value& value) {
         java_object::_edit(this->env, obj, *this, value);
     }
 
@@ -66,18 +66,18 @@ namespace jnio {
         }
     }
 
-    value java_static_field::accessOn(const java_object& obj) const {
+    value java_static_field::access_on(const java_object& obj) const {
         throw jnio_exception("Unable to access a java_static_field from a java_object.");
     }
 	
-    void java_static_field::editOn(java_object& obj, const value& value) {
+    void java_static_field::edit_on(java_object& obj, const value& value) {
         throw jnio_exception("Unable to edit a java_static_field from a java_object.");
     }
 
-    value java_static_field::accessOn(jobject obj) const {
+    value java_static_field::access_on(jobject obj) const {
         throw jnio_exception("Unable to access a java_static_field from a java_object.");
     }
-    void java_static_field::editOn(jobject obj, const value& value) {
+    void java_static_field::edit_on(jobject obj, const value& value) {
         throw jnio_exception("Unable to edit a java_static_field from a java_object.");
     }
 
