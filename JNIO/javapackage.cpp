@@ -2,8 +2,7 @@
 
 namespace jnio {
 
-    java_package::java_package(JNIEnv* env, const std::string& location) {
-		this->env = env;
+    java_package::java_package(const std::string& location) {
 		this->location = location;
     }
     
@@ -11,7 +10,7 @@ namespace jnio {
         if (classname == nullptr) {
             throw std::invalid_argument("Unable to find a Java Class from a nullptr.");
         }
-        return java_class(this->env, *this, classname);
+        return java_class(*this, classname);
     }
 
     const std::string& java_package::string() const noexcept {

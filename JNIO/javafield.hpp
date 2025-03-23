@@ -14,7 +14,6 @@
 
 		class java_field {
 			protected:
-				JNIEnv* env;
 				std::string name;
 				const java_class* clazz;
 				sign::field sign;
@@ -22,7 +21,7 @@
 
 			public:
 				java_field() = default;
-				explicit java_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign);
+				explicit java_field(const std::string& name, const java_class& clazz, const sign::field& sign);
 
 				virtual ~java_field() = default;
 
@@ -48,7 +47,7 @@
 		class java_static_field : public java_field {
 			public:
 				java_static_field() = default;
-				explicit java_static_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign);
+				explicit java_static_field(const std::string& name, const java_class& clazz, const sign::field& sign);
 				
 				virtual ~java_static_field() = default;
 				java_static_field& operator = (const java_static_field& other) = default;

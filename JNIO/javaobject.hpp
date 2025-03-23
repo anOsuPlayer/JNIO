@@ -1,6 +1,7 @@
 #ifndef JNIO_OBJECT
 	#define JNIO_OBJECT
 
+	#include "jnioenv.hpp"
 	#include "javamethod.hpp"
 	#include "javafield.hpp"
 	#include "javavalue.hpp"
@@ -15,18 +16,17 @@
 
 		class java_object {
 			protected:
-				JNIEnv* env;
 				jobject obj;
 
 				java_object() = default;
 
-				static value _call(JNIEnv* env, jobject obj, const java_method& jm, std::initializer_list<value> args = {});
+				static value _call(jobject obj, const java_method& jm, std::initializer_list<value> args = {});
 
-				static value _access(JNIEnv* env, jobject obj, const java_field& jf);
-				static void _edit(JNIEnv* env, jobject obj, const java_field& jf, const value& value);
+				static value _access(jobject obj, const java_field& jf);
+				static void _edit(jobject obj, const java_field& jf, const value& value);
 
 			public:
-				java_object(JNIEnv* env, const jobject& obj);
+				java_object(const jobject& obj);
 				
 				virtual ~java_object();
 
@@ -81,13 +81,12 @@
 
 		class java_object_array {
 			protected:
-				JNIEnv* env;
 				jobjectArray arr;
 				java_object_array_element* currentElement;
 
 			public:
 				java_object_array() = default;
-				java_object_array(JNIEnv* env, const jobjectArray& arr);
+				java_object_array(const jobjectArray& arr);
 
 				virtual ~java_object_array();
 

@@ -2,38 +2,30 @@
 
 namespace jnio {
 
-    java_string::java_string(JNIEnv* env) {
-        this->env = env;
-    }
-
-    java_string::java_string(JNIEnv* env, const std::string& str, size_t init, size_t end) {
-        this->env = env;
+    java_string::java_string(const std::string& str, size_t init, size_t end) {
 		this->text = str.substr(init, end);
     }
 
-    java_string::java_string(JNIEnv* env, java_char_array& charr, size_t init, size_t end) {
-		this->env = env;
+    java_string::java_string(java_char_array& charr, size_t init, size_t end) {
 		this->text = std::string((const char*) charr.get_elements()).substr(init, end);
     }
 
-    java_string::java_string(JNIEnv* env, const jstring& str, size_t init, size_t end) {
-        this->env = env;
-		const char* ch = env->GetStringUTFChars(str, &FALSE);
+    java_string::java_string(const jstring& str, size_t init, size_t end) {
+		const char* ch = JNIOEnv->GetStringUTFChars(str, &FALSE);
 		this->text = std::string(ch).substr(init, end);
-		env->ReleaseStringUTFChars(str, ch);
+		JNIOEnv->ReleaseStringUTFChars(str, ch);
     }
 
     java_string::java_string(const java_string& str, size_t init, size_t end) {
-        this->env = str.env;
 		this->text = str.text.substr(init, end);
     }
 
     java_string& java_string::operator = (const jstring& str) {
         this->text.clear();
 
-		const char* ch = env->GetStringUTFChars(str, &FALSE);
+		const char* ch = JNIOEnv->GetStringUTFChars(str, &FALSE);
 		this->text = std::string(ch);
-		env->ReleaseStringUTFChars(str, ch);
+		JNIOEnv->ReleaseStringUTFChars(str, ch);
 
         return *this;
     }
@@ -50,15 +42,15 @@ namespace jnio {
     }
 
 	java_object java_string::as_object() const noexcept {
-        return java_object(this->env, *this);
+        return java_object(*this);
     }
 
     java_char_array java_string::to_char_array() const noexcept {
-        return java_char_array(this->env, this->length(), std::wstring(this->text.begin(), this->text.end()).c_str());
+        return java_char_array(this->length(), std::wstring(this->text.begin(), this->text.end()).c_str());
     }
 
 	java_string::operator jstring() const noexcept {
-        return env->NewStringUTF(this->text.c_str());
+        return JNIOEnv->NewStringUTF(this->text.c_str());
     }
 
     const std::string& java_string::string() const noexcept {
@@ -74,9 +66,9 @@ namespace jnio {
     }
 
     bool java_string::operator == (jstring str) const noexcept {
-        const char* ch = env->GetStringUTFChars(str, &FALSE);
+        const char* ch = JNIOEnv->GetStringUTFChars(str, &FALSE);
 		bool res = this->text == ch;
-		env->ReleaseStringUTFChars(str, ch);
+		JNIOEnv->ReleaseStringUTFChars(str, ch);
 
 		return res;
     }

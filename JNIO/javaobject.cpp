@@ -2,253 +2,250 @@
 
 namespace jnio {
 
-    java_object::java_object(JNIEnv* env, const jobject& obj) {
-        this->env = env;
-        this->obj = env->NewWeakGlobalRef(obj);
+    java_object::java_object(const jobject& obj) {
+        this->obj = JNIOEnv->NewWeakGlobalRef(obj);
     }
 
     java_object::~java_object() {
         if (this->obj != nullptr) {
-            env->DeleteWeakGlobalRef(this->obj);
+            JNIOEnv->DeleteWeakGlobalRef(this->obj);
         }
     }
 
 	java_object::java_object(const java_object& obj) {
-        this->env = obj.env;
-		this->obj = env->NewWeakGlobalRef(obj.obj);
+		this->obj = JNIOEnv->NewWeakGlobalRef(obj.obj);
     }
 
 	java_object& java_object::operator = (const java_object& other) {
         if (this->obj != nullptr) {
-            env->DeleteWeakGlobalRef(this->obj);
+            JNIOEnv->DeleteWeakGlobalRef(this->obj);
         }
-		this->env = other.env;
-        this->obj = env->NewWeakGlobalRef(other);
+        this->obj = JNIOEnv->NewWeakGlobalRef(other);
         
         return *this;
     }
 
     java_object& java_object::operator = (const jobject& other) {
         if (this->obj != nullptr) {
-            env->DeleteWeakGlobalRef(this->obj);
+            JNIOEnv->DeleteWeakGlobalRef(this->obj);
         }
-        this->obj = env->NewWeakGlobalRef(other);
+        this->obj = JNIOEnv->NewWeakGlobalRef(other);
         
         return *this;
     }
 
-    value java_object::_call(JNIEnv* env, jobject obj, const java_method& jm, std::initializer_list<value> args) {
+    value java_object::_call(jobject obj, const java_method& jm, std::initializer_list<value> args) {
         sign::signature ret = jm.get_signature().return_type();
         value r;
 
         switch (ret[0]) {
             case 'Z' : {
                 if (args.size() == 0) {
-                    r = env->CallBooleanMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallBooleanMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallBooleanMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallBooleanMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'B' : {
                 if (args.size() == 0) {
-                    r = env->CallByteMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallByteMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallByteMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallByteMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'S' : {
                 if (args.size() == 0) {
-                    r = env->CallShortMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallShortMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallShortMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallShortMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'C' : {
                 if (args.size() == 0) {
-                    r = env->CallCharMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallCharMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallCharMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallCharMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'I' : {
                 if (args.size() == 0) {
-                    r = env->CallIntMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallIntMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallIntMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallIntMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'J' : {
                 if (args.size() == 0) {
-                    r = env->CallLongMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallLongMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallLongMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallLongMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'F' : {
                 if (args.size() == 0) {
-                    r = env->CallFloatMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallFloatMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallFloatMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallFloatMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'D' : {
                 if (args.size() == 0) {
-                    r = env->CallDoubleMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallDoubleMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallDoubleMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallDoubleMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             case 'V' : {
                 if (args.size() == 0) {
-                    env->CallVoidMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    JNIOEnv->CallVoidMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    env->CallVoidMethod(obj, jm.getJMethod());
+                    JNIOEnv->CallVoidMethod(obj, jm.getJMethod());
                 }
                 break;
             }
             default : {
                 if (args.size() == 0) {
-                    r = env->CallObjectMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallObjectMethodA(obj, jm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallObjectMethod(obj, jm.getJMethod());
+                    r = JNIOEnv->CallObjectMethod(obj, jm.getJMethod());
                 }
                 break;
             }
         }
 
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
+        if (JNIOEnv->ExceptionCheck()) {
+            JNIOEnv->ExceptionDescribe();
             throw jnio_exception("An error occurred.");
         }
         return r;
     }
 
     value java_object::call(const java_method& jm, std::initializer_list<value> args) const {
-        return java_object::_call(this->env, this->obj, jm, args);
+        return java_object::_call(this->obj, jm, args);
     }
 
-    value java_object::_access(JNIEnv* env, jobject obj, const java_field& jf) {
+    value java_object::_access(jobject obj, const java_field& jf) {
         const char id = jf.get_signature()[0];
         value r;
 
         switch (id) {
             case 'Z' : {
-                r = env->GetBooleanField(obj, jf.get_jfield());
+                r = JNIOEnv->GetBooleanField(obj, jf.get_jfield());
                 break;
             }
             case 'B' : {
-                r = env->GetByteField(obj, jf.get_jfield());
+                r = JNIOEnv->GetByteField(obj, jf.get_jfield());
                 break;
             }
             case 'S' : {
-                r = env->GetShortField(obj, jf.get_jfield());
+                r = JNIOEnv->GetShortField(obj, jf.get_jfield());
                 break;
             }
             case 'C' : {
-                r = env->GetCharField(obj, jf.get_jfield());
+                r = JNIOEnv->GetCharField(obj, jf.get_jfield());
                 break;
             }
             case 'I' : {
-                r = env->GetIntField(obj, jf.get_jfield());
+                r = JNIOEnv->GetIntField(obj, jf.get_jfield());
                 break;
             }
             case 'J' : {
-                r = env->GetLongField(obj, jf.get_jfield());
+                r = JNIOEnv->GetLongField(obj, jf.get_jfield());
                 break;
             }
             case 'F' : {
-                r = env->GetFloatField(obj, jf.get_jfield());
+                r = JNIOEnv->GetFloatField(obj, jf.get_jfield());
                 break;
             }
             case 'D' : {
-                r = env->GetDoubleField(obj, jf.get_jfield());
+                r = JNIOEnv->GetDoubleField(obj, jf.get_jfield());
                 break;
             }
             default : {
-                r = env->GetObjectField(obj, jf.get_jfield());
+                r = JNIOEnv->GetObjectField(obj, jf.get_jfield());
                 break;
             }
         }
 
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
+        if (JNIOEnv->ExceptionCheck()) {
+            JNIOEnv->ExceptionDescribe();
             throw jnio_exception("An error occurred.");
         }
         return r;
     }
 
     value java_object::access(const java_field& jf) const {
-        return java_object::_access(this->env, this->obj, jf);
+        return java_object::_access(this->obj, jf);
     }
 
-    void java_object::_edit(JNIEnv* env, jobject obj, const java_field& jf, const value& value) {
+    void java_object::_edit(jobject obj, const java_field& jf, const value& value) {
         const char id = jf.get_signature()[0];
 
         switch (id) {
             case 'Z' : {
-                env->SetBooleanField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetBooleanField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'B' : {
-                env->SetByteField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetByteField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'S' : {
-                env->SetShortField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetShortField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'C' : {
-                env->SetCharField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetCharField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'I' : {
-                env->SetIntField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetIntField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'J' : {
-                env->SetLongField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetLongField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'F' : {
-                env->SetFloatField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetFloatField(obj, jf.get_jfield(), value);
                 break;
             }
             case 'D' : {
-                env->SetDoubleField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetDoubleField(obj, jf.get_jfield(), value);
                 break;
             }
             default : {
-                env->SetObjectField(obj, jf.get_jfield(), value);
+                JNIOEnv->SetObjectField(obj, jf.get_jfield(), value);
                 break;
             }
         }
 
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
+        if (JNIOEnv->ExceptionCheck()) {
+            JNIOEnv->ExceptionDescribe();
             throw jnio_exception("An error occurred.");
         }
     }
 
     void java_object::edit(const java_field& jf, const value& value) {
-        return java_object::_edit(this->env, this->obj, jf, value);
+        return java_object::_edit(this->obj, jf, value);
     }
 
     java_class java_object::get_class() const {
@@ -256,7 +253,7 @@ namespace jnio {
             throw std::invalid_argument("Unable to call .get_class() method on a null java_object.");
         }
 
-        return java_class(this->env, env->GetObjectClass(this->obj));
+        return java_class(JNIOEnv->GetObjectClass(this->obj));
     }
 
     java_object::operator const jobject&() const noexcept {
@@ -264,21 +261,21 @@ namespace jnio {
     }
 
     jobject java_object::get_jobject() const noexcept {
-        return env->NewLocalRef(this->obj);
+        return JNIOEnv->NewLocalRef(this->obj);
     }
 
 	static jmethodID TO_STRING;
 
     std::string java_object::string() const noexcept {
-        jclass clazz = env->GetObjectClass(this->obj);
+        jclass clazz = JNIOEnv->GetObjectClass(this->obj);
 
 		if (TO_STRING == nullptr) {
-			TO_STRING = env->GetMethodID(clazz, "toString", sign::TO_STRING);
+			TO_STRING = JNIOEnv->GetMethodID(clazz, "toString", sign::TO_STRING);
 		}
 
-        java_string str(this->env, (jstring) env->CallObjectMethod(this->obj, TO_STRING));
+        java_string str((jstring) JNIOEnv->CallObjectMethod(this->obj, TO_STRING));
         std::string res = str.string();
-        env->DeleteLocalRef(clazz);
+        JNIOEnv->DeleteLocalRef(clazz);
 
         return res;
     }
@@ -290,45 +287,45 @@ namespace jnio {
 	static jmethodID EQUALS;
 
     bool java_object::operator == (const jobject& other) const noexcept {
-        jclass clazz = env->GetObjectClass(this->obj);
+        jclass clazz = JNIOEnv->GetObjectClass(this->obj);
         
 		if (EQUALS == nullptr) {
-			EQUALS = env->GetMethodID(clazz, "equals", sign::EQUALS);
+			EQUALS = JNIOEnv->GetMethodID(clazz, "equals", sign::EQUALS);
 		}
 
-        jboolean res = env->CallBooleanMethod(this->obj, EQUALS, obj);
+        jboolean res = JNIOEnv->CallBooleanMethod(this->obj, EQUALS, obj);
         bool eq = (res == 1) ? true : false;
-        env->DeleteLocalRef(clazz);
+        JNIOEnv->DeleteLocalRef(clazz);
 
         return eq;
     }
 	
     bool java_object::same_type(const jobject& obj) const noexcept {
-        return (env->IsInstanceOf(this->obj, env->GetObjectClass(obj)) == 0 ? false : true);
+        return (JNIOEnv->IsInstanceOf(this->obj, JNIOEnv->GetObjectClass(obj)) == 0 ? false : true);
     }
 
     bool java_object::is_instanceof(const jclass& clazz) const noexcept {
-        return (env->IsInstanceOf(this->obj, clazz) == 0 ? false : true);
+        return (JNIOEnv->IsInstanceOf(this->obj, clazz) == 0 ? false : true);
     }
 
     java_object_array_element::java_object_array_element(java_object_array* ref, size_t refIndex)
-		: java_object(ref->env, env->GetObjectArrayElement(ref->arr, refIndex)) {
+		: java_object(JNIOEnv->GetObjectArrayElement(ref->arr, refIndex)) {
         this->ref = ref;
 		this->refIndex = refIndex;
     }
 
     java_object_array_element::~java_object_array_element() {
         if (this->hasChanged) {
-            env->SetObjectArrayElement(this->ref->arr, this->refIndex, this->obj);
+            JNIOEnv->SetObjectArrayElement(this->ref->arr, this->refIndex, this->obj);
         }
     }
 
 	java_object_array_element& java_object_array_element::operator = (const java_object& obj) {
         this->hasChanged = true;
         if (this->obj != nullptr) {
-            env->DeleteWeakGlobalRef(this->obj);
+            JNIOEnv->DeleteWeakGlobalRef(this->obj);
         }
-        this->obj = env->NewWeakGlobalRef(obj);
+        this->obj = JNIOEnv->NewWeakGlobalRef(obj);
         
         return *this;
     }
@@ -336,38 +333,35 @@ namespace jnio {
     java_object_array_element& java_object_array_element::operator = (const jobject& obj) {
         this->hasChanged = true;
         if (this->obj != nullptr) {
-            env->DeleteWeakGlobalRef(this->obj);
+            JNIOEnv->DeleteWeakGlobalRef(this->obj);
         }
-        this->obj = env->NewWeakGlobalRef(obj);
+        this->obj = JNIOEnv->NewWeakGlobalRef(obj);
         
         return *this;
     }
 
-    java_object_array::java_object_array(JNIEnv* env, const jobjectArray& arr) {
-        this->env = env;
-        this->arr = (jobjectArray) env->NewWeakGlobalRef(arr);
+    java_object_array::java_object_array(const jobjectArray& arr) {
+        this->arr = (jobjectArray) JNIOEnv->NewWeakGlobalRef(arr);
     }
 
     java_object_array::java_object_array(const java_object_array& arr) {
-		this->env = env;
-        this->arr = (jobjectArray) env->NewWeakGlobalRef(arr.arr);
+        this->arr = (jobjectArray) JNIOEnv->NewWeakGlobalRef(arr.arr);
     }
 
 	java_object_array& java_object_array::operator = (const jobjectArray& arr) {
         if (this->arr != nullptr) {
-            env->DeleteWeakGlobalRef(this->arr);
+            JNIOEnv->DeleteWeakGlobalRef(this->arr);
         }
-        this->arr = (jobjectArray) env->NewWeakGlobalRef(arr);
+        this->arr = (jobjectArray) JNIOEnv->NewWeakGlobalRef(arr);
 
         return *this;
     }
 
 	java_object_array& java_object_array::operator = (const java_object_array& arr) {
         if (this->arr != nullptr) {
-            env->DeleteWeakGlobalRef(this->arr);
+            JNIOEnv->DeleteWeakGlobalRef(this->arr);
         }
-        this->env = arr.env;
-        this->arr = (jobjectArray) env->NewWeakGlobalRef(arr);
+        this->arr = (jobjectArray) JNIOEnv->NewWeakGlobalRef(arr);
 
         return *this;
     }
@@ -378,7 +372,7 @@ namespace jnio {
         }
 
 		if (this->arr != nullptr) {
-			env->DeleteWeakGlobalRef(this->arr);
+			JNIOEnv->DeleteWeakGlobalRef(this->arr);
 		}
     }
 
@@ -387,11 +381,11 @@ namespace jnio {
     }
 
     jobjectArray java_object_array::getJObjectArray() const noexcept {
-        return (jobjectArray) env->NewLocalRef(this->arr);
+        return (jobjectArray) JNIOEnv->NewLocalRef(this->arr);
     }
 
     java_object java_object_array::as_object() const noexcept {
-        return java_object(this->env, this->arr);
+        return java_object(this->arr);
     }
 
     java_object_array_element& java_object_array::operator [] (size_t index) {
@@ -408,7 +402,7 @@ namespace jnio {
     }
 
     size_t java_object_array::length() const noexcept {
-        return env->GetArrayLength(this->arr);
+        return JNIOEnv->GetArrayLength(this->arr);
     }
 
 	static java_static_method PRINT_ARRAY;
@@ -417,19 +411,19 @@ namespace jnio {
 
     std::string java_object_array::string() const noexcept {
         if (PRINT_ARRAY.string().empty()) {
-            java_class clazz(this->env, "java/util/Arrays");
-            PRINT_ARRAY = java_static_method(this->env, "toString", clazz,
+            java_class clazz("java/util/Arrays");
+            PRINT_ARRAY = java_static_method("toString", clazz,
 				sign::method(sign::STRING, { sign::OBJECT_ARRAY }));
         }
 
-        java_string str(this->env, (jstring) PRINT_ARRAY.call({ this->arr }));
+        java_string str((jstring) PRINT_ARRAY.call({ this->arr }));
         return str.string();
     }
 
     bool java_object_array::operator == (const jobjectArray& arr) const noexcept {
         if (ARRAY_EQUALS.string().empty()) {
-            java_class clazz(this->env, "java/util/Arrays");
-            ARRAY_EQUALS = java_static_method(this->env, "equals", clazz, 
+            java_class clazz("java/util/Arrays");
+            ARRAY_EQUALS = java_static_method("equals", clazz, 
 				sign::method(sign::BOOLEAN, { sign::OBJECT_ARRAY, sign::OBJECT_ARRAY}));
         }
 

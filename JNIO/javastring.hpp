@@ -10,14 +10,13 @@
 
 		class java_string {
 			private:
-				JNIEnv* env;
 				std::string text;
 
 			public:
-				java_string(JNIEnv* env);
-				java_string(JNIEnv* env, const std::string& str, size_t init = 0, size_t chars = std::string::npos);
-				java_string(JNIEnv* env, java_char_array& charr, size_t init = 0, size_t chars = std::string::npos);
-				java_string(JNIEnv* env, const jstring& str, size_t init = 0, size_t chars = std::string::npos);
+				java_string() = default;
+				java_string(const std::string& str, size_t init = 0, size_t chars = std::string::npos);
+				java_string(java_char_array& charr, size_t init = 0, size_t chars = std::string::npos);
+				java_string(const jstring& str, size_t init = 0, size_t chars = std::string::npos);
 				
 				~java_string() = default;
 

@@ -7,49 +7,45 @@ namespace jnio {
 
 	static jmethodID GET_NAME;
 
-    java_class::java_class(JNIEnv* env, jclass clazz) {
-		this->env = env;
-        this->clazz = (jclass) env->NewWeakGlobalRef(clazz);
+    java_class::java_class(jclass clazz) {
+        this->clazz = (jclass) JNIOEnv->NewWeakGlobalRef(clazz);
 
         if (GET_CLASS == nullptr) {
-			GET_CLASS = env->GetMethodID(clazz, "get_class", "()Ljava/lang/Class;");
+			GET_CLASS = JNIOEnv->GetMethodID(clazz, "get_class", "()Ljava/lang/Class;");
 		}
 
-		jclass thisClass = (jclass) env->CallObjectMethod(clazz, GET_CLASS);
+		jclass thisClass = (jclass) JNIOEnv->CallObjectMethod(clazz, GET_CLASS);
 
 		if (GET_NAME == nullptr) {
-			GET_NAME = env->GetMethodID(thisClass, "getName", "()Ljava/lang/String;");
+			GET_NAME = JNIOEnv->GetMethodID(thisClass, "getName", "()Ljava/lang/String;");
 		}
 
-		jstring name = (jstring) env->CallObjectMethod(thisClass, GET_NAME);
+		jstring name = (jstring) JNIOEnv->CallObjectMethod(thisClass, GET_NAME);
 
-        const char* str = env->GetStringUTFChars(name, 0);
+        const char* str = JNIOEnv->GetStringUTFChars(name, 0);
         this->classname = str;
 
-        env->ReleaseStringUTFChars(name, str);
-        env->DeleteLocalRef(name);
-        env->DeleteLocalRef(thisClass);
+        JNIOEnv->ReleaseStringUTFChars(name, str);
+        JNIOEnv->DeleteLocalRef(name);
+        JNIOEnv->DeleteLocalRef(thisClass);
     }
 
-    java_class::java_class(JNIEnv* env, const std::string& classname) {
-		this->env = env;
+    java_class::java_class(const std::string& classname) {
 		this->classname = classname;
 		for (size_t i = 0; i < this->classname.size(); i++) {
             this->classname[i] = (this->classname[i] == '.') ? '/' : this->classname[i];
         }
 
-        jclass c = env->FindClass(this->classname.c_str());
+        jclass c = JNIOEnv->FindClass(this->classname.c_str());
 
         if (c == nullptr) {
             throw no_such_class();
         }
-        this->clazz = (jclass) env->NewWeakGlobalRef(c);
-        env->DeleteLocalRef(c);
+        this->clazz = (jclass) JNIOEnv->NewWeakGlobalRef(c);
+        JNIOEnv->DeleteLocalRef(c);
     }
 	
-    java_class::java_class(JNIEnv* env, const java_package& pack, const std::string& classname) {
-		this->env;
-
+    java_class::java_class(const java_package& pack, const std::string& classname) {
         this->classname = pack.string();
 		this->classname += '/';
 		this->classname += classname;
@@ -57,25 +53,24 @@ namespace jnio {
             this->classname[i] = (this->classname[i] == '.') ? '/' : this->classname[i];
         }
 
-        jclass c = env->FindClass(this->classname.c_str());
+        jclass c = JNIOEnv->FindClass(this->classname.c_str());
 
         if (c == nullptr) {
             throw no_such_class();
         }
-        this->clazz = (jclass) env->NewWeakGlobalRef(c);
+        this->clazz = (jclass) JNIOEnv->NewWeakGlobalRef(c);
 
-        env->DeleteLocalRef(c);
+        JNIOEnv->DeleteLocalRef(c);
     }
 
     java_class::java_class(const java_class& clazz) {
-		this->env = clazz.env;
         this->classname = clazz.classname;
-        this->clazz = (jclass) env->NewWeakGlobalRef(clazz.clazz);
+        this->clazz = (jclass) JNIOEnv->NewWeakGlobalRef(clazz.clazz);
     }
 
     java_class::~java_class() {
         if (this->clazz != nullptr) {
-            env->DeleteWeakGlobalRef(this->clazz);
+            JNIOEnv->DeleteWeakGlobalRef(this->clazz);
         }
     }
 
@@ -83,9 +78,9 @@ namespace jnio {
         this->classname = other.classname;
 
         if (this->clazz != nullptr) {
-            env->DeleteWeakGlobalRef(this->clazz);
+            JNIOEnv->DeleteWeakGlobalRef(this->clazz);
         }
-        this->clazz = (jclass) env->NewWeakGlobalRef(other.clazz);
+        this->clazz = (jclass) JNIOEnv->NewWeakGlobalRef(other.clazz);
 
         return *this;
     }
@@ -96,98 +91,98 @@ namespace jnio {
         switch (jsm.get_signature().return_type().string()[0]) {
             case 'Z' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticBooleanMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticBooleanMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticBooleanMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticBooleanMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'B' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticByteMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticByteMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticByteMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticByteMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'S' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticShortMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticShortMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticShortMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticShortMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'C' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticCharMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticCharMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticCharMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticCharMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'I' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticIntMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticIntMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticIntMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticIntMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'J' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticLongMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticLongMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticLongMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticLongMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'F' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticFloatMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticFloatMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticFloatMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticFloatMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'D' : {
                 if (args.size() != 0) {
-                    r = env->CallStaticDoubleMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticDoubleMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticDoubleMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticDoubleMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             case 'V' : {
                 if (args.size() != 0) {
-                    env->CallStaticVoidMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    JNIOEnv->CallStaticVoidMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    env->CallStaticVoidMethod(this->clazz, jsm.getJMethod());
+                    JNIOEnv->CallStaticVoidMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
             default : {
                 if (args.size() != 0) {
-                    r = env->CallStaticObjectMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
+                    r = JNIOEnv->CallStaticObjectMethodA(this->clazz, jsm.getJMethod(), (jvalue*) args.begin());
                 }
                 else {
-                    r = env->CallStaticObjectMethod(this->clazz, jsm.getJMethod());
+                    r = JNIOEnv->CallStaticObjectMethod(this->clazz, jsm.getJMethod());
                 }
                 break;
             }
         }
 
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
+        if (JNIOEnv->ExceptionCheck()) {
+            JNIOEnv->ExceptionDescribe();
             throw jnio_exception("An error occurred.");
         }
         return r;
@@ -199,45 +194,45 @@ namespace jnio {
 
         switch (id) {
             case 'Z' : {
-                r = env->GetStaticBooleanField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticBooleanField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'B' : {
-                r = env->GetStaticByteField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticByteField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'S' : {
-                r = env->GetStaticShortField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticShortField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'C' : {
-                r = env->GetStaticCharField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticCharField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'I' : {
-                r = env->GetStaticIntField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticIntField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'J' : {
-                r = env->GetStaticLongField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticLongField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'F' : {
-                r = env->GetStaticFloatField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticFloatField(this->clazz, jsf.get_jfield());
                 break;
             }
             case 'D' : {
-                r = env->GetStaticDoubleField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticDoubleField(this->clazz, jsf.get_jfield());
                 break;
             }
             default : {
-                r = env->GetStaticObjectField(this->clazz, jsf.get_jfield());
+                r = JNIOEnv->GetStaticObjectField(this->clazz, jsf.get_jfield());
                 break;
             }
         }
 
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
+        if (JNIOEnv->ExceptionCheck()) {
+            JNIOEnv->ExceptionDescribe();
             throw jnio_exception("An error occurred.");
         }
         return r;
@@ -248,45 +243,45 @@ namespace jnio {
 
         switch (id) {
             case 'Z' : {
-                env->SetStaticBooleanField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticBooleanField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'B' : {
-                env->SetStaticByteField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticByteField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'S' : {
-                env->SetStaticShortField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticShortField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'C' : {
-                env->SetStaticCharField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticCharField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'I' : {
-                env->SetStaticIntField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticIntField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'J' : {
-                env->SetStaticLongField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticLongField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'F' : {
-                env->SetStaticFloatField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticFloatField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             case 'D' : {
-                env->SetStaticDoubleField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticDoubleField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
             default : {
-                env->SetStaticObjectField(this->clazz, jsf.get_jfield(), value);
+                JNIOEnv->SetStaticObjectField(this->clazz, jsf.get_jfield(), value);
                 break;
             }
         }
 
-        if (env->ExceptionCheck()) {
-            env->ExceptionDescribe();
+        if (JNIOEnv->ExceptionCheck()) {
+            JNIOEnv->ExceptionDescribe();
             throw jnio_exception("An error occurred.");
         }
     }
@@ -296,43 +291,43 @@ namespace jnio {
     }
 
     jclass java_class::getJClass() const noexcept {
-        return (jclass) env->NewLocalRef(this->clazz);
+        return (jclass) JNIOEnv->NewLocalRef(this->clazz);
     }
 
     java_object java_class::as_object() const noexcept {
-        return java_object(this->env, this->clazz);
+        return java_object(this->clazz);
     }
 
     java_method java_class::getMethod(const char* name, const sign::method& ms) const {
         if (name == nullptr) {
             throw std::invalid_argument("Unable to find any java_method from a nullptr.");
         }
-        return java_method(this->env, name, *this, ms);
+        return java_method(name, *this, ms);
     }
 
     java_static_method java_class::getStaticMethod(const char* name, const sign::method& ms) const {
         if (name == nullptr) {
             throw std::invalid_argument("Unable to find any java_static_method from a nullptr.");
         }
-        return java_static_method(this->env, name, *this, ms);
+        return java_static_method(name, *this, ms);
     }
 
     java_constructor java_class::getConstructor(const sign::constructor& cs) const {
-        return java_constructor(this->env, *this, cs);
+        return java_constructor(*this, cs);
     }
 
     java_field java_class::getField(const char* name, const sign::field& fs) {
         if (name == nullptr) {
             throw std::invalid_argument("Unable to find any java_field from a nullptr.");
         }
-        return java_field(this->env, name, *this, fs);
+        return java_field(name, *this, fs);
     }
 
     java_static_field java_class::getStaticField(const char* name, const sign::field& fs) {
         if (name == nullptr) {
             throw std::invalid_argument("Unable to find any java_static_field from a nullptr.");
         }
-        return java_static_field(this->env, name, *this, fs);
+        return java_static_field(name, *this, fs);
     }
 
     bool java_class::isArray() const noexcept {
@@ -340,7 +335,7 @@ namespace jnio {
     }
 
     bool java_class::extends(const jclass& clazz) const noexcept {
-        return env->IsAssignableFrom(this->clazz, clazz);
+        return JNIOEnv->IsAssignableFrom(this->clazz, clazz);
     }
 
     java_class java_class::arrayType(size_t level) const {
@@ -350,7 +345,7 @@ namespace jnio {
 
 		if (this->isArray()) {
 			std::string name = '[' + this->classname;
-			return java_class(this->env, name);
+			return java_class(name);
 		}
 
 		std::string name('[', level);
@@ -358,17 +353,17 @@ namespace jnio {
 		name += this->classname;
 		name += ';';
 
-        return java_class(this->env, name);
+        return java_class(name);
     }
 
     java_class java_class::componentType() const noexcept {
         if (this->classname[0] == '[') {
 			if (this->classname[1] == '[') {
-				return java_class(this->env, this->classname.substr(1));
+				return java_class(this->classname.substr(1));
 			}
 
 			std::string name = this->classname.substr(2);
-			return java_class(this->env, this->classname.substr(0, this->classname.size()-1));
+			return java_class(this->classname.substr(0, this->classname.size()-1));
         }
 
 		return *this;
@@ -377,7 +372,7 @@ namespace jnio {
 	java_class java_class::baseType() const noexcept {
         if (this->classname[0] == '[') {
 			std::string name = this->classname.substr(this->classname.find_first_of('L')+1);
-			return java_class(this->env, this->classname.substr(0, this->classname.size()-1));
+			return java_class(this->classname.substr(0, this->classname.size()-1));
         }
 
 		return *this;

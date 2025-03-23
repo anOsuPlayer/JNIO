@@ -5,6 +5,7 @@
 	#include <concepts>
 
 	#include "javavalue.hpp"
+	#include "jnioenv.hpp"
 	#include "jnioexception.hpp"
 
 	namespace jnio {
@@ -17,11 +18,8 @@
 			protected:
 				A arr;
 				mutable T* elements = nullptr;
-				JNIEnv* env;
 
-				java_array(JNIEnv* env) {
-					this->env = env;
-				}
+				java_array() = default;
 
 				virtual void release_elements() const noexcept = 0;
 
@@ -57,7 +55,7 @@
 				
 				size_t length() const noexcept {
 					release_elements();
-					return env->GetArrayLength(arr);
+					return JNIOEnv->GetArrayLength(arr);
 				}
 		};
 
@@ -66,10 +64,10 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_boolean_array(JNIEnv* env);
-				java_boolean_array(JNIEnv* env, const jbooleanArray& arr);
-				java_boolean_array(JNIEnv* env, size_t size, const jboolean* args = nullptr);
-				java_boolean_array(JNIEnv* env, std::initializer_list<jboolean> args);
+				java_boolean_array();
+				java_boolean_array(const jbooleanArray& arr);
+				java_boolean_array(size_t size, const jboolean* args = nullptr);
+				java_boolean_array(std::initializer_list<jboolean> args);
 
 				virtual ~java_boolean_array() = default;
 
@@ -85,10 +83,10 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_byte_array(JNIEnv* env);
-				java_byte_array(JNIEnv* env, const jbyteArray& arr);
-				java_byte_array(JNIEnv* env, size_t size, const jbyte* args = nullptr);
-				java_byte_array(JNIEnv* env, std::initializer_list<jbyte> args);
+				java_byte_array();
+				java_byte_array(const jbyteArray& arr);
+				java_byte_array(size_t size, const jbyte* args = nullptr);
+				java_byte_array(std::initializer_list<jbyte> args);
 
 				virtual ~java_byte_array() = default;
 
@@ -104,10 +102,10 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_short_array(JNIEnv* env);
-				java_short_array(JNIEnv* env, const jshortArray& arr);
-				java_short_array(JNIEnv* env, size_t size, const jshort* args = nullptr);
-				java_short_array(JNIEnv* env, std::initializer_list<jshort> args);
+				java_short_array();
+				java_short_array(const jshortArray& arr);
+				java_short_array(size_t size, const jshort* args = nullptr);
+				java_short_array(std::initializer_list<jshort> args);
 
 				virtual ~java_short_array() = default;
 
@@ -123,11 +121,11 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_char_array(JNIEnv* env);
-				java_char_array(JNIEnv* env, const jcharArray& arr);
-				java_char_array(JNIEnv* env, size_t size, const jchar* args = nullptr);
-				java_char_array(JNIEnv* env, size_t size, const wchar_t* args = nullptr);
-				java_char_array(JNIEnv* env, std::initializer_list<jchar> args);
+				java_char_array();
+				java_char_array(const jcharArray& arr);
+				java_char_array(size_t size, const jchar* args = nullptr);
+				java_char_array(size_t size, const wchar_t* args = nullptr);
+				java_char_array(std::initializer_list<jchar> args);
 
 				virtual ~java_char_array() = default;
 
@@ -143,10 +141,10 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_int_array(JNIEnv* env);
-				java_int_array(JNIEnv* env, const jintArray& arr);
-				java_int_array(JNIEnv* env, size_t size, const jint* args = nullptr);
-				java_int_array(JNIEnv* env, std::initializer_list<jint> args);
+				java_int_array();
+				java_int_array(const jintArray& arr);
+				java_int_array(size_t size, const jint* args = nullptr);
+				java_int_array(std::initializer_list<jint> args);
 
 				virtual ~java_int_array() = default;
 
@@ -162,10 +160,10 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_long_array(JNIEnv* env);
-				java_long_array(JNIEnv* env, const jlongArray& arr);
-				java_long_array(JNIEnv* env, size_t size, const jlong* args = nullptr);
-				java_long_array(JNIEnv* env, std::initializer_list<jlong> args);
+				java_long_array();
+				java_long_array(const jlongArray& arr);
+				java_long_array(size_t size, const jlong* args = nullptr);
+				java_long_array(std::initializer_list<jlong> args);
 
 				virtual ~java_long_array() = default;
 
@@ -181,10 +179,10 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_float_array(JNIEnv* env);
-				java_float_array(JNIEnv* env, const jfloatArray& arr);
-				java_float_array(JNIEnv* env, size_t size, const jfloat* args = nullptr);
-				java_float_array(JNIEnv* env, std::initializer_list<jfloat> args);
+				java_float_array();
+				java_float_array(const jfloatArray& arr);
+				java_float_array(size_t size, const jfloat* args = nullptr);
+				java_float_array(std::initializer_list<jfloat> args);
 
 				virtual ~java_float_array() = default;
 
@@ -200,10 +198,10 @@
 				virtual void release_elements() const noexcept override final;
 			
 			public:
-				java_double_array(JNIEnv* env);
-				java_double_array(JNIEnv* env, const jdoubleArray& arr);
-				java_double_array(JNIEnv* env, size_t size, const jdouble* args = nullptr);
-				java_double_array(JNIEnv* env, std::initializer_list<jdouble> args);
+				java_double_array();
+				java_double_array(const jdoubleArray& arr);
+				java_double_array(size_t size, const jdouble* args = nullptr);
+				java_double_array(std::initializer_list<jdouble> args);
 
 				virtual ~java_double_array() = default;
 

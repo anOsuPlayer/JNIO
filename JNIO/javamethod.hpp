@@ -18,7 +18,6 @@
 
 		class java_method {
 			protected:
-				JNIEnv* env;
 				std::string name;
 				const java_class* clazz;
 				sign::method sign;
@@ -26,7 +25,7 @@
 
 			public:
 				java_method() = default;
-				explicit java_method(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::method& sign);
+				explicit java_method(const std::string& name, const java_class& clazz, const sign::method& sign);
 				
 				~java_method() = default;
 
@@ -49,7 +48,7 @@
 		class java_static_method : public java_method {
 			public:
 				java_static_method() = default;
-				explicit java_static_method(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::method& sign);
+				explicit java_static_method(const std::string& name, const java_class& clazz, const sign::method& sign);
 				
 				~java_static_method() = default;
 				java_static_method& operator = (const java_static_method& other) = default;
@@ -65,8 +64,8 @@
 		class java_constructor : public java_method {
 			public:
 				java_constructor() = default;
-				explicit java_constructor(JNIEnv* env, const java_class& clazz, const sign::constructor& cs);
-				explicit java_constructor(JNIEnv* env, const java_class& clazz);
+				explicit java_constructor(const java_class& clazz, const sign::constructor& cs);
+				explicit java_constructor(const java_class& clazz);
 				
 				~java_constructor() = default;
 

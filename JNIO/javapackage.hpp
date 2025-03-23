@@ -13,18 +13,16 @@
 		class java_package {
 			private:
 				std::string location;
-				JNIEnv* env;
 
 			public:
 				java_package() = delete;
-				explicit java_package(JNIEnv* env, const std::string& location);
+				explicit java_package(const std::string& location);
 				
 				~java_package() = default;
 
 				java_package(const java_package& pack) = default;
 				java_package& operator = (const java_package& other) = default;
 				
-
 				java_class get_class(const char* classname) const;
 
 				const std::string& string() const noexcept;

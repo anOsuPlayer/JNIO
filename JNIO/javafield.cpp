@@ -2,12 +2,11 @@
 
 namespace jnio {
 
-    java_field::java_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign) {
-        this->env = env;
+    java_field::java_field(const std::string& name, const java_class& clazz, const sign::field& sign) {
         this->clazz = &clazz;
         this->name = name;
         this->sign = sign;
-        this->field = env->GetFieldID(clazz.getJClass(), name.c_str(), sign);
+        this->field = JNIOEnv->GetFieldID(clazz.getJClass(), name.c_str(), sign);
 
         if (this->field == nullptr) {
             throw no_such_field();
@@ -35,11 +34,11 @@ namespace jnio {
     }
 
     value java_field::access_on(jobject obj) const {
-        return java_object::_access(this->env, obj, *this);
+        return java_object::_access(obj, *this);
     }
 
     void java_field::edit_on(jobject obj, const value& value) {
-        java_object::_edit(this->env, obj, *this, value);
+        java_object::_edit(obj, *this, value);
     }
 
     const std::string& java_field::string() const noexcept {
@@ -54,12 +53,12 @@ namespace jnio {
         return this->name == other.name && this->sign == other.sign && this->clazz == other.clazz;
     }
 
-    java_static_field::java_static_field(JNIEnv* env, const std::string& name, const java_class& clazz, const sign::field& sign) {
-		this->env = env;
+    java_static_field::java_static_field(const std::string& name, const java_class& clazz, const sign::field& sign) {
+		
         this->clazz = &clazz;
         this->name = name;
         this->sign = sign;
-        this->field = env->GetStaticFieldID(clazz.getJClass(), name.c_str(), sign);
+        this->field = JNIOEnv->GetStaticFieldID(clazz.getJClass(), name.c_str(), sign);
 
         if (this->field == nullptr) {
             throw no_such_field();

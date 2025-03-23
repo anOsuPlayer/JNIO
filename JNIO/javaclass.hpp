@@ -4,6 +4,7 @@
 	#include <jni.h>
 	#include <string>
 
+	#include "jnioenv.hpp"
 	#include "javapackage.hpp"
 	#include "javaobject.hpp"
 	#include "javamethod.hpp"
@@ -27,13 +28,12 @@
 			protected:
 				std::string classname;
 				jclass clazz;
-				JNIEnv* env;
 
 			public:
 				java_class() = default;
-				java_class(JNIEnv* env, jclass clazz);
-				explicit java_class(JNIEnv* env, const std::string& fullname);
-				explicit java_class(JNIEnv* env, const java_package& pack, const std::string& classname);
+				java_class(jclass clazz);
+				explicit java_class(const std::string& fullname);
+				explicit java_class(const java_package& pack, const std::string& classname);
 				
 				virtual ~java_class();
 
